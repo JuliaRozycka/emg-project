@@ -1,5 +1,6 @@
 # This is a sample Python script.
 import Visualizator as v
+from Testowy import printx
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
@@ -13,5 +14,5 @@ def print_hi(name):
 if __name__ == '__main__':
     print_hi('PyCharm')
     v.visualize_signal("osoba_2_prawa_p1.csv")
-
+    printx("HIII")
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
