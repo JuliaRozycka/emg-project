@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
-    data = read_data('dane_testowe.csv')
+    filtered_data, data = read_data('dane_testowe.csv',100)
 
     column_names = ["Biceps", "Triceps", "Zginacz", "Prostownik"]
 
@@ -27,12 +27,13 @@ if __name__ == '__main__':
     window_size = 1000  # Adjust the window size based on your needs
     threshold_factor = 100  # Adjust the threshold factor based on your needs
 
-    hand_movements = threshold_segmentation_with_window(data, 0.01, 2000)
+    hand_movements = threshold_segmentation_with_window(filtered_data, 0.005, 2000)
 
 
-    print(hand_movements)
+    print(len(hand_movements))
 
     visualize_signal(data)
+    visualize_signal(filtered_data)
 
 
 

@@ -2,8 +2,10 @@ from pandas import DataFrame
 import pandas as pd
 import numpy as np
 
+from scipy.fft import fft, ifft
 
-def read_data(filename: str) -> DataFrame:
+
+def read_data(filename: str, cutoff_frequency) -> DataFrame:
 
     # Set column names
     column_names = ["Biceps", "Triceps", "Zginacz", "Prostownik"]
@@ -16,11 +18,25 @@ def read_data(filename: str) -> DataFrame:
     time_col = np.arange(0.001, rows * 0.001 + 0.001, 0.001)
     df['Czas'] = time_col
 
+    fs = 1000
+
     # Calculate sum of four columns
-    df['Sum'] = np.abs(df['Biceps']*0.35+df['Triceps']*0.1+df['Prostownik']*0.2+df['Zginacz']*0.35)
+    df['Sum'] = df['Biceps']*0.35+df['Triceps']*0.1+df['Prostownik']*0.2+df['Zginacz']*0.35
+
+    signal = df['Sum'].values
+
+    frequency_spectrum = fft(signal)
+
+    freq_axis = np.fft.fftfreq(len(signal), 1/fs)
+
+    frequency_spectrum[np.abs(freq_axis) > cutoff_frequency] = 0
+
+    filtered_signal = ifft(frequency_spectrum)
+
+    filtered_df = pd.DataFrame({'Czas' : df['Czas'].values, 'Sum': np.abs(np.real(filtered_signal))})
 
 
-    return df
+    return filtered_df, df
 
 
 import numpy as np
