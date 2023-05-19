@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 def visualize_signal(data: DataFrame):
 
-    data['Sum'].plot()
+    data.plot(x='Czas',y='Sum')
     plt.title('Line Plot')
     plt.xlabel('Czas')
     plt.ylabel('Napięcie')
