@@ -86,19 +86,23 @@ def threshold_segmentation(df, threshold):
 def threshold_segmentation_with_window(df, threshold, window_size):
     segments = []
     start = None
+    latest_end_index = 0
+    ignore_after=5000 #devP ~ oczywiście można to dodać jako argument funkcji i ustawić odgórnie na to 5000, nie chciałam aż tyle zmieniać
 
     for i in range(len(df)):
-        if i >= window_size:
-            window = df['Sum'].values[i - window_size: i]
-            mean = np.mean(window)
-            if mean > threshold:
-                if start is None:
-                    start = df['Czas'].values[i]
-            else:
-                if start is not None:
-                    end = df['Czas'].values[i-1]
-                    segments.append((start, end))
-                    start = None
+        if i > latest_end_index + ignore_after: #devP
+            if i >= window_size:
+                window = df['Sum'].values[i - window_size: i]
+                mean = np.mean(window)
+                if mean > threshold:
+                    if start is None:
+                        start = df['Czas'].values[i]
+                else:
+                    if start is not None:
+                        end = df['Czas'].values[i - 1]
+                        segments.append((start, end))
+                        start = None
+                        latest_end_index = i
 
     if start is not None:
         end = df['Czas'].values[-1]

@@ -27,13 +27,34 @@ if __name__ == '__main__':
     window_size = 1000  # Adjust the window size based on your needs
     threshold_factor = 100  # Adjust the threshold factor based on your needs
 
-    hand_movements = threshold_segmentation_with_window(filtered_data, 0.005, 2000)
+    hand_movements = threshold_segmentation_with_window(filtered_data, 0.0025, 2000)
 
 
     print(len(hand_movements))
+    print(hand_movements) #devP
+    print(filtered_data.head()) #devP
 
-    visualize_signal(data)
-    visualize_signal(filtered_data)
+    #visualize_signal(data)
+    #visualize_signal(filtered_data)
+
+
+    # devP - to poniżej tylko żeby zrobić wykresik
+    start_points=[point[0] for point in hand_movements]
+    end_points=[point[1] for point in hand_movements]
+    y_svalue=[0.03]*len(start_points)
+    y_evalue = [0.04] * len(end_points)
+    xfd=filtered_data['Czas']
+    yfd=filtered_data['Sum']
+    plt.figure(3)
+    plt.plot(xfd, yfd)
+    plt.plot(start_points,y_svalue,'o', c='r',alpha=1.0)
+    plt.plot(end_points,y_evalue,'o',c='b',alpha=1.0)
+    plt.xticks(np.arange(0, 301, 10))
+    plt.show()
+
+
+
+
 
 
 
