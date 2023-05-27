@@ -38,11 +38,11 @@ def read_data(filename: str, cutoff_frequency) -> DataFrame:
 import numpy as np
 
 
-def threshold_segmentation_with_window(df, threshold, window_size):
+def threshold_segmentation_with_window(df, threshold, window_size, ignore_after=5000):
     segments = []
     start = None
     latest_end_index = 0
-    ignore_after = 5000  # devP ~ oczywiście można to dodać jako argument funkcji i ustawić odgórnie na to 5000, nie chciałam aż tyle zmieniać
+    #ignore_after = 5000  # devP ~ oczywiście można to dodać jako argument funkcji i ustawić odgórnie na to 5000, nie chciałam aż tyle zmieniać
 
     for i in range(len(df)):
         if i > latest_end_index + ignore_after:  # devP
