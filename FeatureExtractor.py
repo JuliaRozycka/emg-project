@@ -1,6 +1,10 @@
 import numpy as np
 import pandas as pd
 from Feature import Feature
+import os
+import uuid
+
+import re
 
 
 def extract_feature(filename, window_size, overlap_ratio, feature: Feature):
@@ -45,10 +49,22 @@ def extract_features(filename, window_size, overlap_ratio, save_to_classes: bool
     iemg_feature = extract_feature(filename, window_size, overlap_ratio, Feature.IEMG)
     var_feature = extract_feature(filename, window_size, overlap_ratio, Feature.VAR)
 
-    feature_df = pd.DataFrame({'RMS': rms_feature, 'MAV': mav_feature, 'SSI': ssi_feature, 'IEMG': iemg_feature, 'VAR': var_feature})
+    feature_df = pd.DataFrame(
+        {'RMS': rms_feature, 'MAV': mav_feature, 'SSI': ssi_feature, 'IEMG': iemg_feature, 'VAR': var_feature})
 
+    # Extract the number x from the filename using regular expression
+    x = re.search(r"o(\d+)_p(\d+)_(\d+)\.csv$", filename)
+    move_class = int(x.group(3))
+    uid = uuid.uuid4()
+
+    directory = f"features/{move_class}"
+
+    # check if path exists
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # save to file
     if save_to_classes is True:
-        pass
+        feature_df.to_csv(f"{directory}/{uid}.csv", index=False)
 
     return feature_df
-
