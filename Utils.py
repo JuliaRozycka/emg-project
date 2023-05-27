@@ -6,7 +6,6 @@ import json
 from Visualizator import save_plot
 
 from scipy.fft import fft, ifft
-from Visualizator import visualize_selected_moves
 
 
 def read_data(filename: str, cutoff_frequency) -> DataFrame:
@@ -25,29 +24,28 @@ def read_data(filename: str, cutoff_frequency) -> DataFrame:
 
     # Calculate sum of four columns
     df['Sum'] = df['Biceps'] * 0.35 + df['Triceps'] * 0.1 + df['Prostownik'] * 0.2 + df['Zginacz'] * 0.35
+
     signal = df['Sum'].values
     frequency_spectrum = fft(signal)
     freq_axis = np.fft.fftfreq(len(signal), 1 / fs)
     frequency_spectrum[np.abs(freq_axis) > cutoff_frequency] = 0
     filtered_signal = ifft(frequency_spectrum)
-    filtered_df = pd.DataFrame({'Czas': df['Czas'].values, 'Sum': np.abs(np.real(filtered_signal))})
+    filtered_df = pd.DataFrame(
+        {'Czas': df['Czas'].values, 'AbsSum': np.abs(np.real(filtered_signal)), 'Sum': np.real(filtered_signal)})
 
     return filtered_df
-
-
-import numpy as np
 
 
 def threshold_segmentation_with_window(df, threshold, window_size):
     segments = []
     start = None
     latest_end_index = 0
-    ignore_after = 5000  # devP ~ oczywiście można to dodać jako argument funkcji i ustawić odgórnie na to 5000, nie chciałam aż tyle zmieniać
+    ignore_after = 5000
 
     for i in range(len(df)):
         if i > latest_end_index + ignore_after:  # devP
             if i >= window_size:
-                window = df['Sum'].values[i - window_size: i]
+                window = df['AbsSum'].values[i - window_size: i]
                 mean = np.mean(window)
                 if mean > threshold:
                     if start is None:
@@ -80,18 +78,18 @@ def save_segments_to_files(osoba: int, pomiar: int, data: DataFrame, movements: 
     with open(file_name, "w") as json_file:
         json.dump(metadata, json_file)
 
-    save_plot(data, movements, f"{directory}/o{osoba}_p{pomiar}.svg")
+
+    if savefig is True:
+        save_plot(data, movements, f"{directory}/o{osoba}_p{pomiar}.svg")
 
     filtered_df = data.copy()
 
-
     for x1, x2 in movements:
-
-        #segments
+        # segments
         cut_df = data[(data['Czas'] >= x1) & (data['Czas'] <= x2)]
         cut_df.to_csv(f"{directory}/o{osoba}_p{pomiar}_{i}.csv", index=False)
 
-        #rest of the signal
+        # rest of the signal
         filtered_df = filtered_df.drop(filtered_df[(filtered_df['Czas'] >= x1) & (filtered_df['Czas'] <= x2)].index)
 
         i += 1

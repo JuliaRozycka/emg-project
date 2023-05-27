@@ -1,58 +1,48 @@
-import pandas as pd
-from pandas import DataFrame
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
+from pandas import DataFrame
 
 
 def visualize_signal(data: DataFrame):
-
-    data.plot(x='Czas',y='Sum')
+    data.plot()
     plt.title('Line Plot')
-    plt.xlabel('Czas')
-    plt.xticks(np.arange(0,301,10)) #devP
+    plt.xlabel('Próbki')
     plt.ylabel('Napięcie')
 
     # Show the plot
     plt.show()
 
-def visualize_selected_moves(data: DataFrame, movements: []):
 
+def visualize_selected_moves(data: DataFrame, movements: [], show: bool = True):
     mpl.rcParams['font.family'] = 'serif'
     mpl.rcParams['font.serif'] = ['Times New Roman']
-    mpl.rcParams['font.size'] = 12
+    mpl.rcParams['font.size'] = 10
+
+    fig, axs = plt.subplots(2)
 
     xfd = data['Czas']
     yfd = data['Sum']
-    plt.figure(3)
-    plt.plot(xfd, yfd, linewidth=1)
+    yafd = data['AbsSum']
+
+    axs[0].plot(xfd, yfd, linewidth=1)
+    axs[1].plot(xfd, yafd, linewidth=1)
 
     for x1, x2 in movements:
         cut_df = data[(data['Czas'] >= x1) & (data['Czas'] <= x2)]
-        plt.plot(cut_df['Czas'], cut_df['Sum'], color='r', linewidth=1)
+        axs[0].plot(cut_df['Czas'], cut_df['Sum'], color='r', linewidth=1)
+        axs[1].plot(cut_df['Czas'], cut_df['AbsSum'], color='r', linewidth=1)
 
-    plt.ylabel('Voltage [mV]')
-    plt.xlabel('Time [s]')
+    for ax in axs.flat:
+        ax.set(xlabel='Time [s]', ylabel='Voltage [mV]')
 
-    plt.show()
+    for ax in axs.flat:
+        ax.label_outer()
+
+    if show is True:
+        plt.show()
+    return plt
 
 
 def save_plot(data: DataFrame, movements: [], directory: str):
-
-    mpl.rcParams['font.family'] = 'serif'
-    mpl.rcParams['font.serif'] = ['Times New Roman']
-    mpl.rcParams['font.size'] = 12
-
-    xfd = data['Czas']
-    yfd = data['Sum']
-    plt.plot(xfd, yfd, linewidth=1)
-
-    for x1, x2 in movements:
-        cut_df = data[(data['Czas'] >= x1) & (data['Czas'] <= x2)]
-        plt.plot(cut_df['Czas'], cut_df['Sum'], color='r', linewidth=1)
-
-    plt.ylabel('Voltage [mV]')
-    plt.xlabel('Time [s]')
-
-    plt.gcf().set_size_inches(10, 5)
-    plt.savefig(f'{directory}')
+    plot = visualize_selected_moves(data, movements, show=False)
+    plot.savefig(f'{directory}')
