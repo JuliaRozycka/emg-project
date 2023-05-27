@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import json
 
 if __name__ == '__main__':
-    window_size = 600  # Adjust the window size based on your needs
-    threshold = 0.002  # Adjust the threshold factor based on your needs
+    window_size = 300  # Adjust the window size based on your needs
+    threshold = 0.0014  # Adjust the threshold factor based on your needs
     cutoff = 100  # Cutoff value in Hz
 
     metadata = {
@@ -17,15 +17,15 @@ if __name__ == '__main__':
     }
 
     # tutaj zmieniać tylko nazwę pliku
-    nazwa_pliku = 'osoba_3_lewa_p1.csv'
+    nazwa_pliku = 'osoba_4_lewa_p1.csv'
 
     data = read_data(f'raw_signals/{nazwa_pliku}', cutoff)
 
-    hand_movements = threshold_segmentation_with_window(data, threshold, window_size,ignore_after=7500)
+    hand_movements = threshold_segmentation_with_window(data, threshold, window_size,ignore_after=6000)
     print(len(hand_movements))
     print(hand_movements)
     visualize_selected_moves(data, hand_movements)
 
 
     # zapisywanie od plików, TODO: tutaj należy zmieniać osobę i pomiar
-    #save_segments_to_files(3, 1, data, hand_movements, metadata, savefig=True)
+    #save_segments_to_files(4, 1, data, hand_movements, metadata, savefig=True)
