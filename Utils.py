@@ -4,11 +4,19 @@ import numpy as np
 import os
 import json
 from Visualizator import save_plot
-
+import re
 from scipy.fft import fft, ifft
 
 
 def read_data(filename: str, cutoff_frequency) -> DataFrame:
+    """
+    Function that reads data from csv file, does weighted summation into one channel,
+    cleans the signal by additional filtering and returns filtered signal
+
+    :param filename: filepath
+    :param cutoff_frequency: frequency to cut of the signal
+    :return: filtered signal in form of a dataframe
+    """
     # Set column names
     column_names = ["Biceps", "Triceps", "Zginacz", "Prostownik"]
 
@@ -37,6 +45,19 @@ def read_data(filename: str, cutoff_frequency) -> DataFrame:
 
 
 def threshold_segmentation_with_window(df, threshold, window_size):
+    """
+    Function used to extract different moves from signal.
+    It takes two main paramteres to do this: window size and
+    threshold. It calculates mean of the signal in this window, 
+    if it is bigger than threshold it starts capturing the movement.
+    As soon as it gets below threshold the capturing ends and then function
+    ignores few seconds of signal. 
+
+    :param df: signal in form of a dataframe
+    :param threshold: threshold where the signal is to be detected
+    :param window_size: window size
+    :return: list of pairs - start time and end time of the move
+    """
     segments = []
     start = None
     latest_end_index = 0
@@ -66,6 +87,18 @@ def threshold_segmentation_with_window(df, threshold, window_size):
 
 def save_segments_to_files(osoba: int, pomiar: int, data: DataFrame, movements: [], metadata: dict,
                            savefig: bool = False):
+    """
+    Function used to save segments into files, and to save figure
+    that contains visual representation of which signals are taken into
+    account
+
+    :param osoba: number of person
+    :param pomiar: number of measurment
+    :param data: signal
+    :param movements: list of pairs: start time and end time of the move
+    :param metadata: file metadata - window size etc.
+    :param saveifig: bool variable to choose if plot are to be saved to svg file    
+    """
     i = 1
 
     directory = f"data/o{osoba}/p{pomiar}"
@@ -95,3 +128,14 @@ def save_segments_to_files(osoba: int, pomiar: int, data: DataFrame, movements: 
         i += 1
 
     filtered_df.to_csv(f"{directory}/o{osoba}_p{pomiar}_0.csv", index=False)
+
+
+def check_if_csv(filename: str) -> bool:
+    """
+    Functions used to check if file is a csv file
+
+    :param filename: file path
+    :returns
+    """
+
+    return bool(re.search(r"(\d+)\.csv$", filename))
