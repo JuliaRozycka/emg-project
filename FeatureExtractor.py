@@ -79,6 +79,8 @@ def extract_features(filename, window_size, overlap, save_to_classes: bool = Fal
     # Extract the number x from the filename using regular expression
     x = re.search(r"o(\d+)_p(\d+)_(\d+)\.csv$", filename)
     move_class = int(x.group(3))
+    person = int(x.group(1))
+    measurement = int(x.group(2))
     uid = uuid.uuid4()
 
     directory = f"features/{move_class}"
@@ -89,6 +91,6 @@ def extract_features(filename, window_size, overlap, save_to_classes: bool = Fal
 
     # save to file
     if save_to_classes is True:
-        feature_df.to_csv(f"{directory}/{uid}.csv", index=False)
+        feature_df.to_csv(f"{directory}/{uid}-o{person}p{measurement}.csv", index=False)
 
     return feature_df
