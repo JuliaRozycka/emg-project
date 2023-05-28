@@ -8,6 +8,7 @@ import re
 
 
 def extract_feature(filename, window_size, overlap_ratio, feature: Feature):
+
     overlap = int(window_size * overlap_ratio)
     values = []
 
@@ -31,6 +32,10 @@ def extract_feature(filename, window_size, overlap_ratio, feature: Feature):
             x = np.var(window)
         elif feature == Feature.SSI:
             x = np.sum(np.abs(window) ** 2)
+        elif feature == Feature.WL:
+            x = np.sum(np.abs(np.diff(window)))
+        elif feature == Feature.WAMP:
+            x = np.sum(np.abs(np.diff(window) > 0.0))
         else:
             raise ValueError("Incorrect feature")
 
@@ -48,9 +53,12 @@ def extract_features(filename, window_size, overlap_ratio, save_to_classes: bool
     ssi_feature = extract_feature(filename, window_size, overlap_ratio, Feature.SSI)
     iemg_feature = extract_feature(filename, window_size, overlap_ratio, Feature.IEMG)
     var_feature = extract_feature(filename, window_size, overlap_ratio, Feature.VAR)
+    wl_feature = extract_feature(filename, window_size, overlap_ratio, Feature.WL)
+    wamp_feature = extract_feature(filename, window_size, overlap_ratio, Feature.WAMP)
 
     feature_df = pd.DataFrame(
-        {'RMS': rms_feature, 'MAV': mav_feature, 'SSI': ssi_feature, 'IEMG': iemg_feature, 'VAR': var_feature})
+        {'RMS': rms_feature, 'MAV': mav_feature, 'SSI': ssi_feature, 'IEMG': iemg_feature, 'VAR': var_feature,
+         'WL': wl_feature, 'WAMP': wamp_feature})
 
     # Extract the number x from the filename using regular expression
     x = re.search(r"o(\d+)_p(\d+)_(\d+)\.csv$", filename)

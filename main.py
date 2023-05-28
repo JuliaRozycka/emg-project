@@ -5,6 +5,7 @@ from Visualizator import visualize_selected_moves, visualize_signal
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
+import os
 
 if __name__ == '__main__':
     window_size = 300  # Adjust the window size based on your needs
@@ -35,9 +36,49 @@ if __name__ == '__main__':
     window = 100  # window size in samples
     overlap_ratio = 0.9  # overlap size in samples
 
-    for i in range(0,19):
-        filename = f"data/o1/p2/o1_p2_{i}.csv"
-        df_features = extract_features(filename, window, overlap_ratio, save_to_classes=True)
+    # for i in range(0,19):
+    #     filename = f"data/o1/p2/o1_p2_{i}.csv"
+    #     df_features = extract_features(filename, window, overlap_ratio, save_to_classes=True)
+    #
+
+    root_dir = "features/"
+
+    # Create an empty list to store MAV data
+    mav_data = []
+
+    # Iterate over folder names from 0 to 18
+    for folder_name in range(1,19):
+        # Generate the folder path
+        folder_path = os.path.join(root_dir, str(folder_name))
+
+        # Check if the folder exists
+        if not os.path.exists(folder_path):
+            continue
+
+        # Iterate over files in the folder
+        for file_name in os.listdir(folder_path):
+            # Generate the file path
+            file_path = os.path.join(folder_path, file_name)
+
+            # Process the file
+            # Do something with the file path (e.g., extract features)
+            df = pd.read_csv(file_path)
+            mav_data.append(df['SSI'].mean())
+
+            # Example: Print the file path
+            print(file_path)
+
+    # Create a scatter plot with all MAV data
+    fig, ax = plt.subplots()
+    for i, data in enumerate(mav_data):
+        ax.scatter(data, data, label=f'Folder {i}')
+    ax.set_xlabel('Index')
+    ax.set_ylabel('MAV')
+    ax.set_title('Scatter Plot of MAV')
+    ax.legend()
+    plt.show()
+
+
 
 
 
