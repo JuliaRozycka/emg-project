@@ -32,7 +32,6 @@ def read_data(filename: str, cutoff_frequency) -> DataFrame:
 
     # Calculate sum of four columns
     df['Sum'] = df['Biceps'] * 0.35 + df['Triceps'] * 0.1 + df['Prostownik'] * 0.2 + df['Zginacz'] * 0.35
-
     signal = df['Sum'].values
     frequency_spectrum = fft(signal)
     freq_axis = np.fft.fftfreq(len(signal), 1 / fs)
@@ -48,20 +47,22 @@ def threshold_segmentation_with_window(df, threshold, window_size):
     """
     Function used to extract different moves from signal.
     It takes two main paramteres to do this: window size and
-    threshold. It calculates mean of the signal in this window, 
+    threshold. It calculates mean of the signal in this window,
     if it is bigger than threshold it starts capturing the movement.
     As soon as it gets below threshold the capturing ends and then function
-    ignores few seconds of signal. 
+    ignores few seconds of signal.
 
     :param df: signal in form of a dataframe
     :param threshold: threshold where the signal is to be detected
     :param window_size: window size
     :return: list of pairs - start time and end time of the move
     """
+
+def threshold_segmentation_with_window(df, threshold, window_size, ignore_after=5000):
     segments = []
     start = None
     latest_end_index = 0
-    ignore_after = 5000
+
 
     for i in range(len(df)):
         if i > latest_end_index + ignore_after:  # devP
@@ -97,7 +98,7 @@ def save_segments_to_files(osoba: int, pomiar: int, data: DataFrame, movements: 
     :param data: signal
     :param movements: list of pairs: start time and end time of the move
     :param metadata: file metadata - window size etc.
-    :param saveifig: bool variable to choose if plot are to be saved to svg file    
+    :param saveifig: bool variable to choose if plot are to be saved to svg file
     """
     i = 1
 
@@ -139,3 +140,20 @@ def check_if_csv(filename: str) -> bool:
     """
 
     return bool(re.search(r"(\d+)\.csv$", filename))
+
+def count_files_in_folders(directory):
+    # Iterate over folder names from 0 to 18
+    for folder_name in range(19):
+        # Generate the folder path
+        folder_path = os.path.join(directory, str(folder_name))
+
+        # Check if the folder exists
+        if not os.path.exists(folder_path):
+            continue
+
+        # Count the number of files in the folder
+        file_count = len(os.listdir(folder_path))
+
+        # Print the result
+        print(f"Folder {folder_name}: {file_count} files")
+

@@ -1,6 +1,7 @@
 from Feature import Feature
 from FeatureExtractor import extract_feature, extract_features
-from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files, check_if_csv
+from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files, check_if_csv, \
+    count_files_in_folders
 from Visualizator import visualize_selected_moves, visualize_signal
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -45,6 +46,7 @@ if __name__ == '__main__':
             csv_name = os.path.join(subdir, file)
             if check_if_csv(csv_name) is True:
                 df_features = extract_features(csv_name, window, overlap, save_to_classes=True)
+                print(f'{csv_name} extracted')
 
 
 
@@ -85,7 +87,8 @@ if __name__ == '__main__':
     # ax.legend()
     # plt.show()
 
+    print("Extraction done")
 
-
-
-
+    # Call the function with the directory path
+    directory = "features/"
+    count_files_in_folders(directory)
