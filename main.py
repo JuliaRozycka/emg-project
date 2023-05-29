@@ -1,15 +1,16 @@
 from Feature import Feature
 from FeatureExtractor import extract_feature, extract_features
 from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files, check_if_csv, \
-    count_files_in_folders
+    count_files_in_folders, sliding_window_normalization, z_score_normalization
 from Visualizator import visualize_selected_moves, visualize_signal
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
 import os
 
-if __name__ == '__main__':
+from SVM_classifier import train_SVM, extract_features_to_csv
 
+if __name__ == '__main__':
     window_size = 300  # Adjust the window size based on your needs
     threshold = 0.0017  # Adjust the threshold factor based on your needs
     cutoff = 100  # Cutoff value in Hz
@@ -39,16 +40,18 @@ if __name__ == '__main__':
     window = 150  # Set window size in samples
     overlap = 50  # Set overlap size in samples
 
-    rootdir = 'data/'
+    # Extract features
+    # ---------------------------------------------------------------------------------
 
-    for subdir, dirs, files in os.walk(rootdir):
-        for file in files:
-            csv_name = os.path.join(subdir, file)
-            if check_if_csv(csv_name) is True:
-                df_features = extract_features(csv_name, window, overlap, save_to_classes=True)
-                print(f'{csv_name} extracted')
-
-
+    # rootdir = 'data/'
+    #
+    # for subdir, dirs, files in os.walk(rootdir):
+    #     for file in files:
+    #         csv_name = os.path.join(subdir, file)
+    #         if check_if_csv(csv_name) is True:
+    #             df_features = extract_features(csv_name, window, overlap, save_to_classes=True)
+    #             print(f'{csv_name} extracted')
+    # ---------------------------------------------------------------------------------
 
     # root_dir = "features/"
     #
@@ -91,4 +94,25 @@ if __name__ == '__main__':
 
     # Call the function with the directory path
     directory = "features/"
-    count_files_in_folders(directory)
+    # count_files_in_folders(directory)
+
+    # train_SVM(directory)
+
+    # extract_features_to_csv(directory)
+
+    df = read_data('raw_signals/osoba_1_lewa_p1.csv', 100)
+
+    #sliding_window_normalization(df, 'raw_signals/osoba_1_lewa_p1.csv',150)
+    z_score_normalization(df, 'raw_signals/osoba_1_lewa_p1.csv')
+
+    # df_plot = pd.read_csv('raw_signals/osoba_1_lewa_p1_normalized.csv')
+    #
+    # df_plot.plot()
+    #
+    # plt.show()
+
+    df_plot = pd.read_csv('raw_signals/osoba_1_lewa_p1_normalized_z-score.csv')
+
+    df_plot.plot()
+
+    plt.show()
