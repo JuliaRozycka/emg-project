@@ -4,7 +4,7 @@ import numpy as np
 import os
 import json
 from Visualizator import save_plot
-
+import re
 from scipy.fft import fft, ifft
 
 
@@ -96,3 +96,14 @@ def save_segments_to_files(osoba: int, pomiar: int, data: DataFrame, movements: 
         i += 1
 
     filtered_df.to_csv(f"{directory}/o{osoba}_p{pomiar}_0.csv", index=False)
+
+def check_if_csv(filename: str) -> bool:
+    """
+    Functions used to check if file is a csv file
+
+    :param filename: file path
+    :returns
+    """
+
+    return bool(re.search(r"(\d+)\.csv$", filename))
+
