@@ -127,7 +127,6 @@ def save_segments_to_files(osoba: int, pomiar: int, data: DataFrame, movements: 
 
     filtered_df.to_csv(f"{directory}/o{osoba}_p{pomiar}_0.csv", index=False)
 
-
 def check_if_csv(filename: str) -> bool:
     """
     Functions used to check if file is a csv file
@@ -154,67 +153,6 @@ def count_files_in_folders(directory):
 
         # Print the result
         print(f"Folder {folder_name}: {file_count} files")
-
-
-def sliding_window_normalization(data, filename, window_size):
-    # Read the dataset from the file
-
-    # Get the Amplitude column
-    amplitudes = data['Sum']
-
-    # Perform sliding window normalization
-    normalized_amplitudes = []
-    rolling_window = []
-
-    for amplitude in amplitudes:
-        # Add the current amplitude to the rolling window
-        rolling_window.append(amplitude)
-
-        # If the rolling window exceeds the desired window size, remove the oldest sample
-        if len(rolling_window) > window_size:
-            rolling_window.pop(0)
-
-        # Calculate the mean and standard deviation of the rolling window
-        window_mean = sum(rolling_window) / len(rolling_window)
-        window_std = (sum((value - window_mean) ** 2 for value in rolling_window) / len(rolling_window)) ** 0.5
-
-        # Apply sliding-window normalization
-        if window_std != 0:
-            normalized_amplitude = (amplitude - window_mean) / window_std
-        else:
-            normalized_amplitude = 0
-        normalized_amplitudes.append(normalized_amplitude)
-
-    # Update the Amplitude column with the normalized values
-    data['Sum'] = normalized_amplitudes
-
-    # Save the updated dataset to a new file
-    normalized_filename = filename.replace('.csv', '_normalized.csv')
-    data.to_csv(normalized_filename, index=False)
-
-    print("Sliding-window normalization completed. Normalized data saved to", normalized_filename)
-
-
-def z_score_normalization(data, filename):
-    # Get the Amplitude column
-    amplitudes = data['Sum']
-
-    # Calculate the mean and standard deviation of the Amplitude column
-    mean = amplitudes.mean()
-    std = amplitudes.std()
-
-    # Apply Z-score normalization to the Amplitude column
-    normalized_amplitudes = (amplitudes - mean) / std
-
-    # Update the Amplitude column with the normalized values
-    data['Sum'] = normalized_amplitudes
-
-    # Save the updated dataset to a new file
-    normalized_filename = filename.replace('.csv', '_normalized_z-score.csv')
-    data.to_csv(normalized_filename, index=False)
-
-    print("Z-score normalization completed. Normalized data saved to", normalized_filename)
-
 
 def search_for_min_max(osoba: int, pomiar: int):
     """
@@ -279,3 +217,4 @@ def normalize_data(filename):
     normalized.to_csv(f'{directory}o{osoba}_p{pomiar}_{ruch}.csv', index=False)
 
     return  normalized
+

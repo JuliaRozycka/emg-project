@@ -41,8 +41,13 @@ def extracting_features():
         for file in files:
             csv_name = os.path.join(subdir, file)
             if check_if_csv(csv_name) is True:
-                df_features = extract_features(csv_name, window, overlap, save_to_classes=True)
+                df_features = extract_features(csv_name, save_to_classes=True)
                 print(f'{csv_name} extracted')
+    # ---------------------------------------------------------------------------------
+    root_dir = "features/"
+
+    # Create an empty list to store MAV data
+    mav_data = []
 
 
 def normalizing_data():
@@ -74,3 +79,4 @@ if __name__ == '__main__':
     axs[1].set_title('Normalized')
 
     plt.show()
+
