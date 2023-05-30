@@ -1,118 +1,76 @@
-from Feature import Feature
-from FeatureExtractor import extract_feature, extract_features
-from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files, check_if_csv, \
-    count_files_in_folders, sliding_window_normalization, z_score_normalization
-from Visualizator import visualize_selected_moves, visualize_signal
-import pandas as pd
-import matplotlib.pyplot as plt
-import re
+from FeatureExtractor import extract_features
 import os
+import matplotlib.pyplot as plt
+import pandas as pd
+from FeatureExtractor import extract_features
+from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files, check_if_csv, \
+    normalize_data
+from Visualizator import visualize_selected_moves
 
-from SVM_classifier import train_SVM, extract_features_to_csv
 
-if __name__ == '__main__':
+def filtering_n_segmenting_signals():
     window_size = 300  # Adjust the window size based on your needs
     threshold = 0.0017  # Adjust the threshold factor based on your needs
     cutoff = 100  # Cutoff value in Hz
 
-    # Filtering and segmenting raw signals
-    # --------------------------------------------------------------------------------
+    nazwa_pliku = 'dane_testowe.csv'
 
-    # nazwa_pliku = 'dane_testowe.csv'
-    #
-    # data = read_data(f'raw_signals/{nazwa_pliku}', cutoff)
-    #
-    # hand_movements = threshold_segmentation_with_window(data, threshold, window_size)
-    #
-    # metadata = {
-    #     "window_size": window_size,
-    #     "threshold": threshold,
-    #     "cutoff": cutoff,
-    #     "segments": hand_movements
-    # }
-    #
-    # visualize_selected_moves(data, hand_movements)
-    #
-    # # zapisywanie od plików,
-    # save_segments_to_files(1, 2, data, hand_movements, metadata, savefig=True)
-    # --------------------------------------------------------------------------------
+    data = read_data(f'raw_signals/{nazwa_pliku}', cutoff)
 
-    window = 150  # Set window size in samples
-    overlap = 50  # Set overlap size in samples
+    hand_movements = threshold_segmentation_with_window(data, threshold, window_size)
 
-    # Extract features
-    # ---------------------------------------------------------------------------------
+    metadata = {
+        "window_size": window_size,
+        "threshold": threshold,
+        "cutoff": cutoff,
+        "segments": hand_movements
+    }
 
-    # rootdir = 'data/'
-    #
-    # for subdir, dirs, files in os.walk(rootdir):
-    #     for file in files:
-    #         csv_name = os.path.join(subdir, file)
-    #         if check_if_csv(csv_name) is True:
-    #             df_features = extract_features(csv_name, window, overlap, save_to_classes=True)
-    #             print(f'{csv_name} extracted')
-    # ---------------------------------------------------------------------------------
+    visualize_selected_moves(data, hand_movements)
 
-    # root_dir = "features/"
-    #
-    # # Create an empty list to store MAV data
-    # mav_data = []
-    #
-    # # Iterate over folder names from 0 to 18
-    # for folder_name in range(1,19):
-    #     # Generate the folder path
-    #     folder_path = os.path.join(root_dir, str(folder_name))
-    #
-    #     # Check if the folder exists
-    #     if not os.path.exists(folder_path):
-    #         continue
-    #
-    #     # Iterate over files in the folder
-    #     for file_name in os.listdir(folder_path):
-    #         # Generate the file path
-    #         file_path = os.path.join(folder_path, file_name)
-    #
-    #         # Process the file
-    #         # Do something with the file path (e.g., extract features)
-    #         df = pd.read_csv(file_path)
-    #         mav_data.append(df['SSI'].mean())
-    #
-    #         # Example: Print the file path
-    #         print(file_path)
-    #
-    # # Create a scatter plot with all MAV data
-    # fig, ax = plt.subplots()
-    # for i, data in enumerate(mav_data):
-    #     ax.scatter(data, data, label=f'Folder {i}')
-    # ax.set_xlabel('Index')
-    # ax.set_ylabel('MAV')
-    # ax.set_title('Scatter Plot of MAV')
-    # ax.legend()
-    # plt.show()
+    # zapisywanie od plików,
+    save_segments_to_files(1, 2, data, hand_movements, metadata, savefig=True)
 
-    print("Extraction done")
 
-    # Call the function with the directory path
-    directory = "features/"
-    # count_files_in_folders(directory)
+def extracting_features():
+    rootdir = 'normalized_data/'
+    window = 1  # neikatualne trzeba to zmienić
+    overlap = 1
 
-    # train_SVM(directory)
+    for subdir, dirs, files in os.walk(rootdir):
+        for file in files:
+            csv_name = os.path.join(subdir, file)
+            if check_if_csv(csv_name) is True:
+                df_features = extract_features(csv_name, window, overlap, save_to_classes=True)
+                print(f'{csv_name} extracted')
 
-    # extract_features_to_csv(directory)
 
-    df = read_data('raw_signals/osoba_1_lewa_p1.csv', 100)
+def normalizing_data():
+    rootdir = 'data/'
 
-    #sliding_window_normalization(df, 'raw_signals/osoba_1_lewa_p1.csv',150)
-    z_score_normalization(df, 'raw_signals/osoba_1_lewa_p1.csv')
+    for subdir, dirs, files in os.walk(rootdir):
+        for file in files:
+            csv_name = os.path.join(subdir, file)
+            if check_if_csv(csv_name) is True:
+                df = normalize_data(csv_name)
+                print(f'{csv_name} normalized')
 
-    # df_plot = pd.read_csv('raw_signals/osoba_1_lewa_p1_normalized.csv')
-    #
-    # df_plot.plot()
-    #
-    # plt.show()
 
-    df_plot = pd.read_csv('raw_signals/osoba_1_lewa_p1_normalized_z-score.csv')
+if __name__ == '__main__':
+    df_plot = pd.read_csv('data/o1/p1/o1_p1_1.csv')
+    df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_1.csv')
 
-    df_plot.plot()
+    figs, axs = plt.subplots(2, 1)
+
+    sum1 = df_plot['Sum'].values
+    time1 = df_plot['Czas'].values
+
+    sum2 = df_plot_normalized['Sum'].values
+    time2 = df_plot_normalized['Czas'].values
+
+    axs[0].plot(time1, sum1)
+    axs[0].set_title('Raw')
+    axs[1].plot(time2, sum2)
+    axs[1].set_title('Normalized')
 
     plt.show()

@@ -1,76 +1,59 @@
+import os
+import re
+import uuid
 import numpy as np
 import pandas as pd
 from Feature import Feature
-import os
-import uuid
-import re
 
 
-def extract_feature(filename, window_size, overlap, feature: Feature):
+def extract_feature(filename: str, feature: Feature):
     """
     Function extracting specific feature from file
 
     :param filename: file path
-    :param window_size: size of the sliding window in samples (sample size 1 ms)
-    :param overlap: size of overlap of the windows
     :param feature: enum type of feature to extract
-    :return: extracted features in form of a list
+    :return: extracted feature
     """
-
-    values = []
 
     # Load the signal from the file
     data = pd.read_csv(filename)
     signal = data['Sum'].values
 
-    start = 0
-    end = window_size
+    if feature == Feature.RMS:
+        x = np.sqrt(np.mean(np.abs(signal) ** 2))
+    elif feature == Feature.MAV:
+        x = np.mean(np.abs(signal))
+    elif feature == Feature.IEMG:
+        x = np.sum(np.abs(signal))
+    elif feature == Feature.VAR:
+        x = np.var(signal)
+    elif feature == Feature.SSI:
+        x = np.sum(np.abs(signal) ** 2)
+    elif feature == Feature.WL:
+        x = np.sum(np.abs(np.diff(signal)))
+    elif feature == Feature.WAMP:
+        x = np.sum(np.abs(np.diff(signal) > 0.0))
+    else:
+        raise ValueError("Incorrect feature")
 
-    while end <= len(signal):
-        window = signal[start:end]
-
-        if feature == Feature.RMS:
-            x = np.sqrt(np.mean(np.abs(window) ** 2))
-        elif feature == Feature.MAV:
-            x = np.mean(np.abs(window))
-        elif feature == Feature.IEMG:
-            x = np.sum(np.abs(window))
-        elif feature == Feature.VAR:
-            x = np.var(window)
-        elif feature == Feature.SSI:
-            x = np.sum(np.abs(window) ** 2)
-        elif feature == Feature.WL:
-            x = np.sum(np.abs(np.diff(window)))
-        elif feature == Feature.WAMP:
-            x = np.sum(np.abs(np.diff(window) > 0.0))
-        else:
-            raise ValueError("Incorrect feature")
-
-        values.append(x)
-
-        start += window_size - overlap
-        end += window_size - overlap
-
-    return values
+    return x
 
 
-def extract_features(filename, window_size, overlap, save_to_classes: bool = False):
+def extract_features(filename, save_to_classes: bool = False):
     """
     Function to extract all features from file and saving the data into 18 classes
 
     :param filename: filepath
-    :param window_size: window size
-    :param overlap: overlap size
     :param save_to_classes: bool variable to choose if features are to be saved to files
     :return: features dataframe
     """
-    rms_feature = extract_feature(filename, window_size, overlap, Feature.RMS)
-    mav_feature = extract_feature(filename, window_size, overlap, Feature.MAV)
-    ssi_feature = extract_feature(filename, window_size, overlap, Feature.SSI)
-    iemg_feature = extract_feature(filename, window_size, overlap, Feature.IEMG)
-    var_feature = extract_feature(filename, window_size, overlap, Feature.VAR)
-    wl_feature = extract_feature(filename, window_size, overlap, Feature.WL)
-    wamp_feature = extract_feature(filename, window_size, overlap, Feature.WAMP)
+    rms_feature = extract_feature(filename, Feature.RMS)
+    mav_feature = extract_feature(filename, Feature.MAV)
+    ssi_feature = extract_feature(filename, Feature.SSI)
+    iemg_feature = extract_feature(filename, Feature.IEMG)
+    var_feature = extract_feature(filename, Feature.VAR)
+    wl_feature = extract_feature(filename, Feature.WL)
+    wamp_feature = extract_feature(filename, Feature.WAMP)
 
     feature_df = pd.DataFrame(
         {'RMS': rms_feature, 'MAV': mav_feature, 'SSI': ssi_feature, 'IEMG': iemg_feature, 'VAR': var_feature,

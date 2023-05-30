@@ -43,7 +43,7 @@ def read_data(filename: str, cutoff_frequency) -> DataFrame:
     return filtered_df
 
 
-def threshold_segmentation_with_window(df, threshold, window_size):
+def threshold_segmentation_with_window(df, threshold, window_size, ignore_after=5000):
     """
     Function used to extract different moves from signal.
     It takes two main paramteres to do this: window size and
@@ -58,11 +58,9 @@ def threshold_segmentation_with_window(df, threshold, window_size):
     :return: list of pairs - start time and end time of the move
     """
 
-def threshold_segmentation_with_window(df, threshold, window_size, ignore_after=5000):
     segments = []
     start = None
     latest_end_index = 0
-
 
     for i in range(len(df)):
         if i > latest_end_index + ignore_after:  # devP
@@ -112,7 +110,6 @@ def save_segments_to_files(osoba: int, pomiar: int, data: DataFrame, movements: 
     with open(file_name, "w") as json_file:
         json.dump(metadata, json_file)
 
-
     if savefig is True:
         save_plot(data, movements, f"{directory}/o{osoba}_p{pomiar}.svg")
 
@@ -140,6 +137,7 @@ def check_if_csv(filename: str) -> bool:
     """
 
     return bool(re.search(r"(\d+)\.csv$", filename))
+
 
 def count_files_in_folders(directory):
     # Iterate over folder names from 0 to 18
@@ -198,7 +196,6 @@ def sliding_window_normalization(data, filename, window_size):
 
 
 def z_score_normalization(data, filename):
-
     # Get the Amplitude column
     amplitudes = data['Sum']
 
@@ -217,3 +214,68 @@ def z_score_normalization(data, filename):
     data.to_csv(normalized_filename, index=False)
 
     print("Z-score normalization completed. Normalized data saved to", normalized_filename)
+
+
+def search_for_min_max(osoba: int, pomiar: int):
+    """
+
+    """
+    directory = f"data/o{osoba}/p{pomiar}/"
+
+    minimum_list = []
+    maximum_list = []
+
+    for files in os.listdir(directory):
+        path = os.path.join(directory, files)
+        if check_if_csv(path):
+            df = pd.read_csv(path)
+            minimum = df['Sum'].min()
+            maximum = df['Sum'].max()
+            minimum_list.append(minimum)
+            maximum_list.append(maximum)
+
+    minimum_list = sorted(minimum_list)[:3]
+    maximum_list = sorted(maximum_list)[-3:]
+
+    return np.mean(minimum_list), np.mean(maximum_list)
+
+
+def min_max_normalisation(df, min, max):
+    signal = df['Sum']
+
+    normalized_min = -1
+    normalized_max = 1
+    normalized_signal = (signal - min) / (max - min) * (
+            normalized_max - normalized_min) + normalized_min
+
+    df['Sum'] = normalized_signal
+
+    df['AbsSum'] = df['Sum'].abs()
+
+    return df
+
+
+def normalize_data(filename):
+    x = re.search(r"o(\d+)_p(\d+)_(\d+)\.csv$", filename)
+
+    osoba = int(x.group(1))
+    pomiar = int(x.group(2))
+    ruch = int(x.group(3))
+
+    min, max = search_for_min_max(osoba, pomiar)
+
+    df = pd.read_csv(filename)
+
+    df.loc[df['Sum'] > max, 'Sum'] = max
+    df.loc[df['Sum'] < min, 'Sum'] = min
+
+    normalized = min_max_normalisation(df, min, max)
+
+    directory = f'normalized_data/o{osoba}/p{pomiar}/'
+
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    normalized.to_csv(f'{directory}o{osoba}_p{pomiar}_{ruch}.csv', index=False)
+
+    return  normalized

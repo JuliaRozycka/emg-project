@@ -27,6 +27,12 @@ def extract_features_to_csv(directory):
     4) Problem jest tez taki, że lity mają różne długości dla różnych sygnałów,
     bo czasami da się wyekstrachować 7 sekund a czasem jedną, jak radzić sobie z listami
 
+    *************************************************************************************************************
+    UWAGAAA TO EKSTRACHUJE DO PLIKU CECHY W POSTACI WEKTORA CECH NALEZY TO ZMIENIĆ
+    Zostały zmienione funkcje ekstrakcji cech, tak aby ekstrachowały jedną cechę z całego sygnału, jednak:
+    TODO: Należy przeprowadzić ekstrakcję patrz klasa main.py funckja @extracting_features()
+    TODO: Zmienić aby odczytywało z plików w directory features i zapisywało pojedyncze wartości MAV, RMS...
+    *************************************************************************************************************
 
     """
 
