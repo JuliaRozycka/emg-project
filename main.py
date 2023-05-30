@@ -1,5 +1,5 @@
 from Feature import Feature
-from FeatureExtractor import extract_feature
+from FeatureExtractor import extract_feature, extract_features
 from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files
 from Visualizator import visualize_selected_moves, visualize_signal
 import pandas as pd
@@ -11,20 +11,20 @@ if __name__ == '__main__':
     cutoff = 100  # Cutoff value in Hz
 
     # tutaj zmieniać tylko nazwę pliku
-    nazwa_pliku = 'osoba_2_prawa_p1.csv'
-    data = read_data(f'raw_signals/{nazwa_pliku}', cutoff)
-
-    hand_movements = threshold_segmentation_with_window(data, threshold, window_size,ignore_after=5000)
-    print(len(hand_movements))
-    print(hand_movements)
-
-    metadata = {
-        "window_size": window_size,
-        "threshold": threshold,
-        "cutoff": cutoff,
-        "segments": hand_movements
-    }
-    visualize_selected_moves(data, hand_movements)
+    # nazwa_pliku = 'osoba_2_prawa_p1.csv'
+    # data = read_data(f'raw_signals/{nazwa_pliku}', cutoff)
+    #
+    # hand_movements = threshold_segmentation_with_window(data, threshold, window_size,ignore_after=5000)
+    # print(len(hand_movements))
+    # print(hand_movements)
+    #
+    # metadata = {
+    #     "window_size": window_size,
+    #     "threshold": threshold,
+    #     "cutoff": cutoff,
+    #     "segments": hand_movements
+    # }
+    # visualize_selected_moves(data, hand_movements)
     # zapisywanie od plików, TODO: tutaj należy zmieniać osobę i pomiar
     #save_segments_to_files(2, 4, data, hand_movements, metadata, savefig=True)
 
