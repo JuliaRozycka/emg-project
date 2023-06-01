@@ -1,4 +1,5 @@
-from FeatureExtractor import extract_features
+from Feature import Feature
+from FeatureExtractor import extract_features, extract_feature
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -62,8 +63,8 @@ def normalizing_data():
 
 
 if __name__ == '__main__':
-    df_plot = pd.read_csv('data/o1/p1/o1_p1_1.csv')
-    df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_1.csv')
+    df_plot = pd.read_csv('data/o1/p1/o1_p1_3.csv')
+    df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_3.csv')
 
     figs, axs = plt.subplots(2, 1)
 
@@ -79,4 +80,6 @@ if __name__ == '__main__':
     axs[1].set_title('Normalized')
 
     plt.show()
+
+    print(extract_feature("normalized_data/o1/p1/o1_p1_3.csv", Feature.MNF))
 

@@ -53,7 +53,7 @@ def extract_features_to_csv(directory):
                 var_list = extracted_features['VAR'].tolist()
                 wl_list = extracted_features['WL'].tolist()
                 wamp_list = extracted_features['WAMP'].tolist()
-                row = [rms_list, mav_list, ssi_list, iemg_list, var_list, wl_list, wamp_list,_class]
+                row = [rms_list, mav_list, ssi_list, iemg_list, var_list, wl_list, extracted_features['WAMP'],_class]
                 df.loc[len(df)] = row
 
             break

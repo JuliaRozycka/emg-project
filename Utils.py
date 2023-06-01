@@ -5,7 +5,7 @@ import os
 import json
 from Visualizator import save_plot
 import re
-from scipy.fft import fft, ifft
+from scipy.fft import fft, ifft, rfft, rfftfreq
 
 
 def read_data(filename: str, cutoff_frequency) -> DataFrame:
@@ -217,4 +217,12 @@ def normalize_data(filename):
     normalized.to_csv(f'{directory}o{osoba}_p{pomiar}_{ruch}.csv', index=False)
 
     return  normalized
+
+
+def time_to_frequency_domain(signal):
+    sample_rate = 1000  # Hz
+    amplitude = rfft(signal)
+    frequency = rfftfreq(len(signal), 1 / sample_rate)
+
+    return amplitude, frequency
 

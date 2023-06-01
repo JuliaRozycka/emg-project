@@ -4,6 +4,10 @@ import uuid
 import numpy as np
 import pandas as pd
 from Feature import Feature
+from scipy.fft import rfft, rfftfreq
+import matplotlib.pyplot as plt
+from Functions import fVariance, fIntegrated, fSimpleSquareIntegral, fRootMeanSquare, fMeanAbsoluteValue, \
+    fWaveformLength, fWillisonAmplitude, fMeanFrequency, fMedianFrequency
 
 
 def extract_feature(filename: str, feature: Feature):
@@ -20,22 +24,23 @@ def extract_feature(filename: str, feature: Feature):
     signal = data['Sum'].values
 
     if feature == Feature.RMS:
-        x = np.sqrt(np.mean(np.abs(signal) ** 2))
+        x = fRootMeanSquare(signal)
     elif feature == Feature.MAV:
-        x = np.mean(np.abs(signal))
+        x = fMeanAbsoluteValue(signal)
     elif feature == Feature.IEMG:
-        x = np.sum(np.abs(signal))
+        x = fIntegrated(signal)
     elif feature == Feature.VAR:
-        x = np.var(signal)
-    elif feature == Feature.SSI:
-        x = np.sum(np.abs(signal) ** 2)
+        x = fVariance(signal)
     elif feature == Feature.WL:
-        x = np.sum(np.abs(np.diff(signal)))
+        x = fWaveformLength(signal)
     elif feature == Feature.WAMP:
-        x = np.sum(np.abs(np.diff(signal) > 0.0))
+        x = fWillisonAmplitude(signal)
+    elif feature == Feature.MNF:
+        x = fMeanFrequency(signal)
+    elif feature ==  Feature.MDF:
+        x = fMedianFrequency(signal)
     else:
         raise ValueError("Incorrect feature")
-
     return x
 
 
@@ -49,15 +54,16 @@ def extract_features(filename, save_to_classes: bool = False):
     """
     rms_feature = extract_feature(filename, Feature.RMS)
     mav_feature = extract_feature(filename, Feature.MAV)
-    ssi_feature = extract_feature(filename, Feature.SSI)
     iemg_feature = extract_feature(filename, Feature.IEMG)
     var_feature = extract_feature(filename, Feature.VAR)
     wl_feature = extract_feature(filename, Feature.WL)
     wamp_feature = extract_feature(filename, Feature.WAMP)
+    mnf_feature = extract_feature(filename, Feature.MNF)
+    mdf_feature = extract_feature(filename, Feature.MDF)
 
     feature_df = pd.DataFrame(
-        {'RMS': rms_feature, 'MAV': mav_feature, 'SSI': ssi_feature, 'IEMG': iemg_feature, 'VAR': var_feature,
-         'WL': wl_feature, 'WAMP': wamp_feature})
+        {'RMS': rms_feature, 'MAV': mav_feature,'IEMG': iemg_feature, 'VAR': var_feature,
+         'WL': wl_feature, 'WAMP': wamp_feature, 'MNF' : mnf_feature, 'MDF' : mdf_feature})
 
     # Extract the number x from the filename using regular expression
     x = re.search(r"o(\d+)_p(\d+)_(\d+)\.csv$", filename)

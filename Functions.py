@@ -1,6 +1,8 @@
 import math
-
+import matplotlib.pyplot as plt
 import numpy as np
+
+from Utils import time_to_frequency_domain
 
 # Jeżeli nie bierzemy pod uwagę okien czasowych
 ''' Okej to są najprostsze funckje, myślę że dla naszych potrzeb można to również rozszrzyć biorąc dwa argumenty - mp./
@@ -55,3 +57,54 @@ def fWaveformLength(data):
     for k in range(1, N):
         dWL += abs(data[k] - data[k - 1])
     return dWL
+
+
+def fMeanFrequency(data, plot: bool = False):
+    amplitude, frequency = time_to_frequency_domain(data)
+    psd = amplitude ** 2  # Power spectrum density
+
+    cumulative_sum = np.cumsum(psd)  # The sum of a given sequence that is increasing
+
+    frequency_median = frequency[np.where(cumulative_sum > np.max(cumulative_sum) / 2)[0][
+        0]]  # Median is frequency that splits PSD into two identical parts
+    # MDF should use cumsum on the psd and we find were the cumsum is at max(cumsum/2)
+    frequency_mean = np.sum(frequency * psd) / np.sum(psd)  # Mean calculating as usual
+
+    if plot is True:
+        # Plot the frequency spectrum
+        plt.plot(frequency, np.abs(amplitude))
+        plt.axvline(frequency_mean, color='g', linestyle='--', label='Frequency Mean')
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Amplitude')
+        plt.xlim(0.01, 150)
+        plt.title('Frequency Spectrum of EMG Signal')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    return frequency_mean
+
+
+def fMedianFrequency(data, plot: bool = False):
+    amplitude, frequency = time_to_frequency_domain(data)
+    psd = amplitude ** 2  # Power spectrum density
+
+    cumulative_sum = np.cumsum(psd)  # The sum of a given sequence that is increasing
+
+    frequency_median = frequency[np.where(cumulative_sum > np.max(cumulative_sum) / 2)[0][
+        0]]  # Median is frequency that splits PSD into two identical parts
+    # MDF should use cumsum on the psd and we find were the cumsum is at max(cumsum/2)
+
+    if plot is True:
+        # Plot the frequency spectrum
+        plt.plot(frequency, amplitude)
+        plt.axvline(frequency_median, color='g', linestyle='--', label='Frequency Mean')
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Amplitude')
+        plt.xlim(0.01, 150)
+        plt.title('Frequency Spectrum of EMG Signal')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    return frequency_median
