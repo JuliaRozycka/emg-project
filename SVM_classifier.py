@@ -38,7 +38,7 @@ def extract_features_to_csv(directory):
 
     # directory  is features/
     # iterate over folders 1-18 in features
-    df = pd.DataFrame(columns=['RMS','MAV','SSI','IEMG','VAR','WL','WAMP','Class'])
+    df = pd.DataFrame(columns=['RMS','MAV','IEMG','VAR','WL','WAMP','FMN','FMD','Class'])
 
     for _class in range(1,19):
         class_path = os.path.join(directory, str(_class))
@@ -46,17 +46,20 @@ def extract_features_to_csv(directory):
             f = os.path.join(class_path, file)
             if os.path.isfile(f):
                 extracted_features = pd.read_csv(f)
-                rms_list = extracted_features['RMS'].tolist()
-                mav_list = extracted_features['MAV'].tolist()
-                ssi_list = extracted_features['SSI'].tolist()
-                iemg_list = extracted_features['IEMG'].tolist()
-                var_list = extracted_features['VAR'].tolist()
-                wl_list = extracted_features['WL'].tolist()
-                wamp_list = extracted_features['WAMP'].tolist()
-                row = [rms_list, mav_list, ssi_list, iemg_list, var_list, wl_list, wamp_list,_class]
+                row = [
+                    extracted_features['RMS'].values[0],
+                    extracted_features['MAV'].values[0],
+                    extracted_features['IEMG'].values[0],
+                    extracted_features['VAR'].values[0],
+                    extracted_features['WL'].values[0],
+                    extracted_features['WAMP'].values[0],
+                    extracted_features['FMN'].values[0],
+                    extracted_features['FMD'].values[0],
+                    _class
+                ]
                 df.loc[len(df)] = row
 
-            break
+            #break
             # Break after reading first file - to jest do usunięcia jak ustalimy co bierzemy za faetures i czy lista czy co, bo wsm tak sobie
             # myślę że niepotzrebnie chyba bierzemy tyle podobnych features z time domain, można wywalić jakieś 3 i dodać 2 z frequency domain
     df.to_csv('features_for_training.csv', index=False)
@@ -65,7 +68,7 @@ def extract_features_to_csv(directory):
 
 def train_SVM(directory: str):
 
-    feature_names = ['MAV', 'SSI', 'RMS', 'IEMG', 'VAR', 'WL', 'WAMP']
+    feature_names = ['RMS','MAV', 'IEMG', 'VAR', 'WL', 'WAMP','FMN','FMD']
     df = pd.read_csv(directory)
 
     # Trained classifiers

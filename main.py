@@ -1,11 +1,15 @@
+import Feature
 from FeatureExtractor import extract_features
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from FeatureExtractor import extract_features
 from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files, check_if_csv, \
     normalize_data
 from Visualizator import visualize_selected_moves
+from SVM_classifier import extract_features_to_csv
+from Functions import FrequencyFeatures
 
 
 def filtering_n_segmenting_signals():
@@ -37,6 +41,7 @@ def extracting_features():
     window = 1  # neikatualne trzeba to zmienić
     overlap = 1
 
+
     for subdir, dirs, files in os.walk(rootdir):
         for file in files:
             csv_name = os.path.join(subdir, file)
@@ -47,7 +52,7 @@ def extracting_features():
     root_dir = "features/"
 
     # Create an empty list to store MAV data
-    mav_data = []
+    #mav_data = []
 
 
 def normalizing_data():
@@ -62,21 +67,36 @@ def normalizing_data():
 
 
 if __name__ == '__main__':
-    df_plot = pd.read_csv('data/o1/p1/o1_p1_1.csv')
-    df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_1.csv')
 
-    figs, axs = plt.subplots(2, 1)
+    # ---------------------------------------------------------------------------------
+    # df_plot = pd.read_csv('data/o1/p1/o1_p1_1.csv')
+    # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_1.csv')
+    #
+    # figs, axs = plt.subplots(2, 1)
+    #
+    # sum1 = df_plot['Sum'].values
+    # time1 = df_plot['Czas'].values
+    #
+    # sum2 = df_plot_normalized['Sum'].values
+    # time2 = df_plot_normalized['Czas'].values
+    #
+    # axs[0].plot(time1, sum1)
+    # axs[0].set_title('Raw')
+    # axs[1].plot(time2, sum2)
+    # axs[1].set_title('Normalized')
+    #
+    # plt.show()
 
-    sum1 = df_plot['Sum'].values
-    time1 = df_plot['Czas'].values
+    # ---------------------------------------------------------------------------------
+    # extraction_process=extracting_features()
+    # print('Extraction is done')
 
-    sum2 = df_plot_normalized['Sum'].values
-    time2 = df_plot_normalized['Czas'].values
+    # ---------------------------------------------------------------------------------
+    # root_dir = "features/"
+    # df_test_list=extract_features_to_csv(root_dir)
+    # df_test_list.to_csv('DataLearningSet',index=False)
+    # print(df_test_list)
 
-    axs[0].plot(time1, sum1)
-    axs[0].set_title('Raw')
-    axs[1].plot(time2, sum2)
-    axs[1].set_title('Normalized')
-
-    plt.show()
+    # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_3.csv')
+    # data=df_plot_normalized['Sum'].values
 
