@@ -68,30 +68,23 @@ def train_SVM(directory: str):
     feature_names = ['MAV', 'SSI', 'RMS', 'IEMG', 'VAR', 'WL', 'WAMP']
     df = pd.read_csv(directory)
 
-    # Trained classifiers
-    classifiers = {}
+    y = df['Class']
+    X = df.drop(['Class'])
 
-    # Iterate over the feature names
-    for feature in feature_names:
-        y = df['Class']
-        X = df[feature]
 
-        # Split the data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
 
-        # Create an SVM classifier
-        svm = SVC()
+    # Create an SVM classifier
+    svm = SVC()
 
-        # Train the SVM classifier
-        svm.fit(X_train, y_train)
+    # Train the SVM classifier
+    svm.fit(X_train, y_train)
 
-        # Store the trained classifier in the dictionary
-        classifiers[feature] = svm
+    # Make predictions on the test set
+    y_pred = svm.predict(X_test)
 
-        # Make predictions on the test set
-        y_pred = svm.predict(X_test)
+    # Print classification report
+    print(classification_report(y_test, y_pred))
 
-        # Print classification report
-        print(classification_report(y_test, y_pred))
-
-    return classifiers
+    return y_pred
