@@ -9,5 +9,6 @@ class Feature(Enum):
     IEMG = 2
     VAR = 3
     WAMP = 4
-    SSI = 5
-    WL = 6
+    WL = 5
+    FMN = 6
+    FMD = 7
