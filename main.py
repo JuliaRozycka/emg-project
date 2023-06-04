@@ -10,6 +10,8 @@ from Utils import read_data, threshold_segmentation_with_window, save_segments_t
 from Visualizator import visualize_selected_moves
 from SVM_classifier import extract_features_to_csv
 from Functions import FrequencyFeatures
+from DT_classifier import train_DecisionTreeClassifier, train_DecisonTreeClassifier_OneHotEncodingAddition, \
+    trainOVR_DecisionTree, evaluation_statistics, trainOVR_kNN
 
 
 def filtering_n_segmenting_signals():
@@ -66,6 +68,29 @@ def normalizing_data():
                 print(f'{csv_name} normalized')
 
 
+def DTCcheck():
+    directory='features_for_training.csv'
+    treemodel=trainOVR_DecisionTree(directory)
+    y_test=treemodel[1]
+    prediction=treemodel[2]
+    evaluation_of_tree=evaluation_statistics(y_test,prediction)
+
+    print('Separate statistics: ', '\n', evaluation_of_tree[0])
+    print('Full package statistics: ','\n', evaluation_of_tree[2])
+    print('Full package statistics (but the df): ', '\n', evaluation_of_tree[1])
+
+def kNNcheck():
+    directory='features_for_training.csv'
+    knnmodel = trainOVR_kNN(directory)
+    y_test = knnmodel[1]
+    prediction = knnmodel[2]
+    evaluation_of_knn = evaluation_statistics(y_test, prediction)
+
+    print('Separate statistics: ', '\n', evaluation_of_knn[0])
+    print('Full package statistics: ', '\n', evaluation_of_knn[2])
+    print('Full package statistics (but the df): ', '\n', evaluation_of_knn[1])
+
+
 if __name__ == '__main__':
 
     # ---------------------------------------------------------------------------------
@@ -99,4 +124,8 @@ if __name__ == '__main__':
 
     # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_3.csv')
     # data=df_plot_normalized['Sum'].values
+
+    # ---------------------------------------------------------------------------------
+
+    print(DTCcheck())
 
