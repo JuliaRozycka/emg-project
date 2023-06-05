@@ -139,7 +139,7 @@ if __name__ == '__main__':
 
 
     ## Balanced accuracy , kfoldwalidacja
-    # Select best feature (domyślnie anova, test stats -> chi square) ewentualnie PCA, ale to będzie prostsze 
+    # Select best feature (domyślnie anova, test stats -> chi square) ewentualnie PCA, ale to będzie prostsze
     # Im wyższe p value tym większe związanie, skorelowanie
 
     # ---------------------------------------------------------------------------------
