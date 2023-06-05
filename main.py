@@ -1,5 +1,5 @@
 from Feature import Feature
-from FeatureExtractor import extract_features
+from FeatureExtractor import extract_features, extract_feature
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,8 +9,8 @@ from Utils import read_data, threshold_segmentation_with_window, save_segments_t
     normalize_data
 from Visualizator import visualize_selected_moves
 from SVM_classifier import extract_features_to_csv
-
-
+from DT_classifier import train_DecisionTreeClassifier, train_DecisonTreeClassifier_OneHotEncodingAddition, \
+    trainOVR_DecisionTree, evaluation_statistics, trainOVR_kNN
 
 def filtering_n_segmenting_signals():
     window_size = 300  # Adjust the window size based on your needs
@@ -38,8 +38,7 @@ def filtering_n_segmenting_signals():
 
 def extracting_features():
     rootdir = 'normalized_data/'
-    window = 1  # neikatualne trzeba to zmienić
-    overlap = 1
+
 
 
     for subdir, dirs, files in os.walk(rootdir):
@@ -66,7 +65,31 @@ def normalizing_data():
                 print(f'{csv_name} normalized')
 
 
+def DTCcheck():
+    directory='features_for_training.csv'
+    treemodel=trainOVR_DecisionTree(directory)
+    y_test=treemodel[1]
+    prediction=treemodel[2]
+    evaluation_of_tree=evaluation_statistics(y_test,prediction)
+
+    print('Separate statistics: ', '\n', evaluation_of_tree[0])
+    print('Full package statistics: ','\n', evaluation_of_tree[2])
+    print('Full package statistics (but the df): ', '\n', evaluation_of_tree[1])
+
+def kNNcheck():
+    directory='features_for_training.csv'
+    knnmodel = trainOVR_kNN(directory)
+    y_test = knnmodel[1]
+    prediction = knnmodel[2]
+    evaluation_of_knn = evaluation_statistics(y_test, prediction)
+
+    print('Separate statistics: ', '\n', evaluation_of_knn[0])
+    print('Full package statistics: ', '\n', evaluation_of_knn[2])
+    print('Full package statistics (but the df): ', '\n', evaluation_of_knn[1])
+
+
 if __name__ == '__main__':
+    extract_features_to_csv('features/')
 
     # ---------------------------------------------------------------------------------
     # df_plot = pd.read_csv('data/o1/p1/o1_p1_1.csv')
@@ -101,18 +124,31 @@ if __name__ == '__main__':
     # data=df_plot_normalized['Sum'].values
     # root_dir = "features/"
     # extract_features_to_csv(root_dir)
-    df = pd.read_csv('features_for_training.csv')
-    df = df.groupby(['Class']).RMS.mean()
-    dictionary = df.to_dict()
-    keys  = list(dictionary.keys())
-    values = list(dictionary.values())
+    # df = pd.read_csv('features_for_training.csv')
+    # df = df.groupby(['Class']).FMN.mean()
+    #
+    # extract_feature('data/o2/p1/o2_p1_2.csv', Feature.FMD)
+    #
+    #
+    # dictionary = df.to_dict()
+    # keys  = list(dictionary.keys())
+    # values = list(dictionary.values())
+    # plt.xlabel("Class")
+    # plt.ylabel(df.name)
+    #
+    # plt.scatter(keys, values)
+    # plt.xlim(0,19)
+    # plt.xticks([i for i in range(1,19)])
+    # plt.show()
 
-    plt.scatter(keys, values)
-    plt.xlim(1,18)
-    plt.show()
 
 
 
+
+
+    # ---------------------------------------------------------------------------------
+    directory = 'features_for_training.csv'
+    #print(DTCcheck())
 
 
 

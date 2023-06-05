@@ -1,8 +1,5 @@
-import math
 import numpy as np
 import matplotlib.pyplot as plt
-from Feature import Feature
-from scipy.fft import rfft, rfftfreq
 from Utils import time_to_frequency_domain
 
 
@@ -56,12 +53,12 @@ def fMeanFrequency(data, plot: bool = False):
         plt.grid(True)
         plt.show()
 
-    return frequency_mean
+    return np.real(frequency_mean)
 
 
 def fMedianFrequency(data, plot: bool = False):
     amplitude, frequency = time_to_frequency_domain(data)
-    psd = amplitude ** 2  # Power spectrum density
+    psd = np.abs(amplitude) ** 2  # Power spectrum density
 
     cumulative_sum = np.cumsum(psd)  # The sum of a given sequence that is increasing
 
@@ -71,8 +68,8 @@ def fMedianFrequency(data, plot: bool = False):
 
     if plot is True:
         # Plot the frequency spectrum
-        plt.plot(frequency, amplitude)
-        plt.axvline(frequency_median, color='r', linestyle='--', label='Frequency Mean')
+        plt.plot(frequency, np.abs(amplitude))
+        plt.axvline(frequency_median, color='r', linestyle='--', label='Frequency Median')
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Amplitude')
         plt.xlim(0.01, 150)
@@ -81,4 +78,4 @@ def fMedianFrequency(data, plot: bool = False):
         plt.grid(True)
         plt.show()
 
-    return frequency_median
+    return np.real(frequency_median)

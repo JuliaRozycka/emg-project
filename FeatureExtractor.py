@@ -38,9 +38,9 @@ def extract_feature(filename: str, feature: Feature):
     elif feature == Feature.WAMP:
         x = fWillisonAmplitude(signal)
     elif feature == Feature.FMN:
-        x = fMeanFrequency(signal)
+        x = fMeanFrequency(signal, True)
     elif feature == Feature.FMD:
-        x = fMedianFrequency(signal)
+        x = fMedianFrequency(signal, True)
     else:
         raise ValueError("Incorrect feature")
     return x
