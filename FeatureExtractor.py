@@ -10,16 +10,18 @@ from Functions import fVariance, fIntegrated, fSimpleSquareIntegral, fRootMeanSq
     fWaveformLength, fWillisonAmplitude, fMeanFrequency, fMedianFrequency
 
 
+
 def extract_feature(filename: str, feature: Feature):
-    """
-    Function extracting specific feature from file
 
-    :param filename: file path
-    :param feature: enum type of feature to extract
-    :return: extracted feature
     """
+    #     Function extracting specific feature from file
+    #
+    #     :param filename: file path
+    #     :param feature: enum type of feature to extract
+    #     :return: extracted feature
+    #     """
 
-    # Load the signal from the file
+    #Load the signal from the file
     data = pd.read_csv(filename)
     signal = data['Sum'].values
 
@@ -35,14 +37,13 @@ def extract_feature(filename: str, feature: Feature):
         x = fWaveformLength(signal)
     elif feature == Feature.WAMP:
         x = fWillisonAmplitude(signal)
-    elif feature == Feature.MNF:
-        x = fMeanFrequency(signal)
-    elif feature ==  Feature.MDF:
-        x = fMedianFrequency(signal)
+    elif feature == Feature.FMN:
+        x = fMeanFrequency(signal, True)
+    elif feature == Feature.FMD:
+        x = fMedianFrequency(signal, True)
     else:
         raise ValueError("Incorrect feature")
     return x
-
 
 def extract_features(filename, save_to_classes: bool = False):
     """
@@ -58,12 +59,13 @@ def extract_features(filename, save_to_classes: bool = False):
     var_feature = extract_feature(filename, Feature.VAR)
     wl_feature = extract_feature(filename, Feature.WL)
     wamp_feature = extract_feature(filename, Feature.WAMP)
-    mnf_feature = extract_feature(filename, Feature.MNF)
-    mdf_feature = extract_feature(filename, Feature.MDF)
+    fmn_feature = extract_feature(filename, Feature.FMN)
+    fmd_feature = extract_feature(filename, Feature.FMD)
 
     feature_df = pd.DataFrame(
-        {'RMS': rms_feature, 'MAV': mav_feature,'IEMG': iemg_feature, 'VAR': var_feature,
-         'WL': wl_feature, 'WAMP': wamp_feature, 'MNF' : mnf_feature, 'MDF' : mdf_feature})
+        {'RMS': rms_feature, 'MAV': mav_feature, 'IEMG': iemg_feature, 'VAR': var_feature,
+         'WL': wl_feature, 'WAMP': wamp_feature, 'FMN':fmn_feature,'FMD':fmd_feature}, index=[0])
+
 
     # Extract the number x from the filename using regular expression
     x = re.search(r"o(\d+)_p(\d+)_(\d+)\.csv$", filename)

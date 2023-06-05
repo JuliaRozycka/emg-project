@@ -1,63 +1,34 @@
-import math
-import matplotlib.pyplot as plt
 import numpy as np
-
+import matplotlib.pyplot as plt
 from Utils import time_to_frequency_domain
-
-# Jeżeli nie bierzemy pod uwagę okien czasowych
-''' Okej to są najprostsze funckje, myślę że dla naszych potrzeb można to również rozszrzyć biorąc dwa argumenty - mp./
-    ten z czasami start-end i dla wszystkich ruchów od razu to wyznaczać. Druga sprawa czy dodajemy tutaj/
-    z uwzględnieniem okien czasowych - ponieważ jeśli tak, to przez wiele cech nie ma sensu powtarzać kilkakrotnie/
-    kodu podziału data na okna tylko jakoś osobno. No to tak - tyle do ustalenia. 
-'''
 
 
 def fRootMeanSquare(data):
-    # dRMS1=math.sqrt(np.mean(x**2 for x in data))
-    dRMS = math.sqrt(np.mean(np.power(data, 2)))
-    return dRMS
-
-
+    fRMS = np.sqrt(np.mean(np.power(data, 2)))
+    return fRMS
 def fMeanAbsoluteValue(data):
-    dMAV = np.mean(np.abs(data))
-    return dMAV
-
+    fMAV = np.mean(np.abs(data))
+    return fMAV
 
 def fIntegrated(data):
-    dIEMG = np.sum(np.abs(data))
-    return dIEMG
-
+    fIEMG = np.sum(np.abs(data))
+    return fIEMG
 
 def fVariance(data):
-    N = len(data)
-    dVAR = (1 / (N - 1)) * np.sum(np.power(data, 2))
-    return dVAR
-
-
-def fWillisonAmplitude(data, opts=None):
-    threshold = 0.01  # threshold
-    if opts is not None and 'threshold' in opts:
-        threshold = opts['threshold']
-    N = len(data)
-    dWA = 0
-    for k in range(N - 1):
-        if abs(data[k] - data[k + 1]) > threshold:
-            dWA += 1
-    return dWA
-
+    fVAR = np.var(data)
+    return fVAR
 
 def fSimpleSquareIntegral(data):
-    dSSI = np.sum(np.power(data, 2))
-    return dSSI
+    fSSI = np.sum(np.power(data, 2))
+    return fSSI
 
+def fWillisonAmplitude(data):
+    fWAMP=np.sum(np.abs(np.diff(data)) > 0.01)
+    return fWAMP
 
 def fWaveformLength(data):
-    N = len(data)
-    dWL = 0
-    for k in range(1, N):
-        dWL += abs(data[k] - data[k - 1])
-    return dWL
-
+    fWL=np.sum(np.abs(np.diff(data)))
+    return fWL
 
 def fMeanFrequency(data, plot: bool = False):
     amplitude, frequency = time_to_frequency_domain(data)
@@ -73,7 +44,7 @@ def fMeanFrequency(data, plot: bool = False):
     if plot is True:
         # Plot the frequency spectrum
         plt.plot(frequency, np.abs(amplitude))
-        plt.axvline(frequency_mean, color='g', linestyle='--', label='Frequency Mean')
+        plt.axvline(frequency_mean, color='r', linestyle='--', label='Frequency Mean')
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Amplitude')
         plt.xlim(0.01, 150)
@@ -82,12 +53,12 @@ def fMeanFrequency(data, plot: bool = False):
         plt.grid(True)
         plt.show()
 
-    return frequency_mean
+    return np.real(frequency_mean)
 
 
 def fMedianFrequency(data, plot: bool = False):
     amplitude, frequency = time_to_frequency_domain(data)
-    psd = amplitude ** 2  # Power spectrum density
+    psd = np.abs(amplitude) ** 2  # Power spectrum density
 
     cumulative_sum = np.cumsum(psd)  # The sum of a given sequence that is increasing
 
@@ -97,8 +68,8 @@ def fMedianFrequency(data, plot: bool = False):
 
     if plot is True:
         # Plot the frequency spectrum
-        plt.plot(frequency, amplitude)
-        plt.axvline(frequency_median, color='g', linestyle='--', label='Frequency Mean')
+        plt.plot(frequency, np.abs(amplitude))
+        plt.axvline(frequency_median, color='r', linestyle='--', label='Frequency Median')
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Amplitude')
         plt.xlim(0.01, 150)
@@ -107,4 +78,4 @@ def fMedianFrequency(data, plot: bool = False):
         plt.grid(True)
         plt.show()
 
-    return frequency_median
+    return np.real(frequency_median)
