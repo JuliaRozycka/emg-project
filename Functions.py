@@ -32,7 +32,7 @@ def fWaveformLength(data):
 
 def fMeanFrequency(data, plot: bool = False):
     amplitude, frequency = time_to_frequency_domain(data)
-    psd = amplitude ** 2  # Power spectrum density
+    psd = np.abs(amplitude) ** 2  # Power spectrum density
 
     cumulative_sum = np.cumsum(psd)  # The sum of a given sequence that is increasing
 

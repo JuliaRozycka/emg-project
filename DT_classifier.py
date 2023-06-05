@@ -99,8 +99,10 @@ def trainOVR_DecisionTree(directory: str):
         class_prediction=(prediction==i)
         cm=confusion_matrix(class_test,class_prediction)
         print(f'Confusion matrix for {i} label/class: {cm}')
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm,display_labels=['rest',i])
         axi = axes[r, c]
+        axi.set_title(i)
+
         disp.plot(ax=axi)
         disp.im_.colorbar.remove()
         c+= 1

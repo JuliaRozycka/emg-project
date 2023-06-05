@@ -116,6 +116,8 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------------
     # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_3.csv')
     # data=df_plot_normalized['Sum'].values
+
+    # extract_feature('normalized_data/o4/p2/o4_p2_4.csv', Feature.FMD)
     # root_dir = "features/"
     # extract_features_to_csv(root_dir)
     # df = pd.read_csv('features_for_training.csv')
@@ -136,9 +138,13 @@ if __name__ == '__main__':
     # plt.show()
 
 
+    ## Balanced accuracy , kfoldwalidacja
+    # Select best feature (domyślnie anova, test stats -> chi square) ewentualnie PCA, ale to będzie prostsze 
+    # Im wyższe p value tym większe związanie, skorelowanie
+
     # ---------------------------------------------------------------------------------
-    # directory = 'features_for_training.csv'
-    # print(DTCcheck())
+    directory = 'features_for_training.csv'
+    print(DTCcheck())
 
 
 
