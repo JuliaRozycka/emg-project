@@ -1,4 +1,4 @@
-import Feature
+from Feature import Feature
 from FeatureExtractor import extract_features
 import os
 import numpy as np
@@ -9,7 +9,7 @@ from Utils import read_data, threshold_segmentation_with_window, save_segments_t
     normalize_data
 from Visualizator import visualize_selected_moves
 from SVM_classifier import extract_features_to_csv
-from Functions import FrequencyFeatures
+
 
 
 def filtering_n_segmenting_signals():
@@ -99,4 +99,20 @@ if __name__ == '__main__':
 
     # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_3.csv')
     # data=df_plot_normalized['Sum'].values
+    # root_dir = "features/"
+    # extract_features_to_csv(root_dir)
+    df = pd.read_csv('features_for_training.csv')
+    df = df.groupby(['Class']).RMS.mean()
+    dictionary = df.to_dict()
+    keys  = list(dictionary.keys())
+    values = list(dictionary.values())
+
+    plt.scatter(keys, values)
+    plt.xlim(1,18)
+    plt.show()
+
+
+
+
+
 

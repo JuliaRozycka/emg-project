@@ -4,7 +4,11 @@ import uuid
 import numpy as np
 import pandas as pd
 from Feature import Feature
-from Functions import RootMeanSquare, MeanAbsoluteValue, Integrated, Variance, WillisonAmplitude, WaveformLength, FrequencyFeatures
+from scipy.fft import rfft, rfftfreq
+import matplotlib.pyplot as plt
+from Functions import fVariance, fIntegrated, fSimpleSquareIntegral, fRootMeanSquare, fMeanAbsoluteValue, \
+    fWaveformLength, fWillisonAmplitude, fMeanFrequency, fMedianFrequency
+
 
 
 def extract_feature(filename: str, feature: Feature):
@@ -22,21 +26,21 @@ def extract_feature(filename: str, feature: Feature):
     signal = data['Sum'].values
 
     if feature == Feature.RMS:
-        x=RootMeanSquare(signal)
+        x = fRootMeanSquare(signal)
     elif feature == Feature.MAV:
-        x=MeanAbsoluteValue(signal)
+        x = fMeanAbsoluteValue(signal)
     elif feature == Feature.IEMG:
-        x=Integrated(signal)
+        x = fIntegrated(signal)
     elif feature == Feature.VAR:
-        x=Variance(signal)
+        x = fVariance(signal)
     elif feature == Feature.WL:
-        x=WaveformLength(signal)
+        x = fWaveformLength(signal)
     elif feature == Feature.WAMP:
-        x=WillisonAmplitude(signal)
-    elif feature == Feature.FMN: # Frequency Mean
-        x=FrequencyFeatures(signal,feature,savefig=False)
-    elif feature == Feature.FMD: # Frequency Median
-        x=FrequencyFeatures(signal,feature,savefig=False)
+        x = fWillisonAmplitude(signal)
+    elif feature == Feature.FMN:
+        x = fMeanFrequency(signal)
+    elif feature == Feature.FMD:
+        x = fMedianFrequency(signal)
     else:
         raise ValueError("Incorrect feature")
     return x
@@ -61,6 +65,7 @@ def extract_features(filename, save_to_classes: bool = False):
     feature_df = pd.DataFrame(
         {'RMS': rms_feature, 'MAV': mav_feature, 'IEMG': iemg_feature, 'VAR': var_feature,
          'WL': wl_feature, 'WAMP': wamp_feature, 'FMN':fmn_feature,'FMD':fmd_feature}, index=[0])
+
 
     # Extract the number x from the filename using regular expression
     x = re.search(r"o(\d+)_p(\d+)_(\d+)\.csv$", filename)

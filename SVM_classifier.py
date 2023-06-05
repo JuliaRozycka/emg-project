@@ -46,6 +46,7 @@ def extract_features_to_csv(directory):
             f = os.path.join(class_path, file)
             if os.path.isfile(f):
                 extracted_features = pd.read_csv(f)
+
                 row = [
                     extracted_features['RMS'].values[0],
                     extracted_features['MAV'].values[0],
@@ -55,8 +56,9 @@ def extract_features_to_csv(directory):
                     extracted_features['WAMP'].values[0],
                     extracted_features['FMN'].values[0],
                     extracted_features['FMD'].values[0],
-                    _class
+                    int(_class)
                 ]
+
                 df.loc[len(df)] = row
 
             #break
@@ -71,30 +73,23 @@ def train_SVM(directory: str):
     feature_names = ['RMS','MAV', 'IEMG', 'VAR', 'WL', 'WAMP','FMN','FMD']
     df = pd.read_csv(directory)
 
-    # Trained classifiers
-    classifiers = {}
+    y = df['Class']
+    X = df.drop(['Class'])
 
-    # Iterate over the feature names
-    for feature in feature_names:
-        y = df['Class']
-        X = df[feature]
 
-        # Split the data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
 
-        # Create an SVM classifier
-        svm = SVC()
+    # Create an SVM classifier
+    svm = SVC()
 
-        # Train the SVM classifier
-        svm.fit(X_train, y_train)
+    # Train the SVM classifier
+    svm.fit(X_train, y_train)
 
-        # Store the trained classifier in the dictionary
-        classifiers[feature] = svm
+    # Make predictions on the test set
+    y_pred = svm.predict(X_test)
 
-        # Make predictions on the test set
-        y_pred = svm.predict(X_test)
+    # Print classification report
+    print(classification_report(y_test, y_pred))
 
-        # Print classification report
-        print(classification_report(y_test, y_pred))
-
-    return classifiers
+    return y_pred
