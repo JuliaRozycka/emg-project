@@ -89,12 +89,9 @@ def kNNcheck():
 
 
 if __name__ == '__main__':
-    extract_features_to_csv('features/')
-
     # ---------------------------------------------------------------------------------
     # df_plot = pd.read_csv('data/o1/p1/o1_p1_1.csv')
     # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_1.csv')
-    #
     # figs, axs = plt.subplots(2, 1)
     #
     # sum1 = df_plot['Sum'].values
@@ -113,13 +110,10 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------------
     # extraction_process=extracting_features()
     # print('Extraction is done')
-
     # ---------------------------------------------------------------------------------
     # root_dir = "features/"
     # df_test_list=extract_features_to_csv(root_dir)
-    # df_test_list.to_csv('DataLearningSet',index=False)
-    # print(df_test_list)
-
+    # ---------------------------------------------------------------------------------
     # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_3.csv')
     # data=df_plot_normalized['Sum'].values
     # root_dir = "features/"
@@ -142,13 +136,9 @@ if __name__ == '__main__':
     # plt.show()
 
 
-
-
-
-
     # ---------------------------------------------------------------------------------
-    directory = 'features_for_training.csv'
-    #print(DTCcheck())
+    # directory = 'features_for_training.csv'
+    # print(DTCcheck())
 
 
 
