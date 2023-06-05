@@ -1,5 +1,5 @@
-import Feature
-from FeatureExtractor import extract_features
+from Feature import Feature
+from FeatureExtractor import extract_features, extract_feature
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,10 +9,8 @@ from Utils import read_data, threshold_segmentation_with_window, save_segments_t
     normalize_data
 from Visualizator import visualize_selected_moves
 from SVM_classifier import extract_features_to_csv
-from Functions import FrequencyFeatures
 from DT_classifier import train_DecisionTreeClassifier, train_DecisonTreeClassifier_OneHotEncodingAddition, \
-    trainOVR_DecisionTree, evaluation_statistics, trainOVR_kNN, train_OVR_DT
-
+    trainOVR_DecisionTree, evaluation_statistics, trainOVR_kNN
 
 def filtering_n_segmenting_signals():
     window_size = 300  # Adjust the window size based on your needs
@@ -40,8 +38,7 @@ def filtering_n_segmenting_signals():
 
 def extracting_features():
     rootdir = 'normalized_data/'
-    window = 1  # neikatualne trzeba to zmienić
-    overlap = 1
+
 
 
     for subdir, dirs, files in os.walk(rootdir):
@@ -92,6 +89,7 @@ def kNNcheck():
 
 
 if __name__ == '__main__':
+    extract_features_to_csv('features/')
 
     # ---------------------------------------------------------------------------------
     # df_plot = pd.read_csv('data/o1/p1/o1_p1_1.csv')
@@ -124,10 +122,32 @@ if __name__ == '__main__':
 
     # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_3.csv')
     # data=df_plot_normalized['Sum'].values
+    # root_dir = "features/"
+    # extract_features_to_csv(root_dir)
+    # df = pd.read_csv('features_for_training.csv')
+    # df = df.groupby(['Class']).FMN.mean()
+    #
+    # extract_feature('data/o2/p1/o2_p1_2.csv', Feature.FMD)
+    #
+    #
+    # dictionary = df.to_dict()
+    # keys  = list(dictionary.keys())
+    # values = list(dictionary.values())
+    # plt.xlabel("Class")
+    # plt.ylabel(df.name)
+    #
+    # plt.scatter(keys, values)
+    # plt.xlim(0,19)
+    # plt.xticks([i for i in range(1,19)])
+    # plt.show()
+
+
+
+
+
 
     # ---------------------------------------------------------------------------------
     directory = 'features_for_training.csv'
-    treemodel = train_OVR_DT(directory)
     #print(DTCcheck())
 
 
