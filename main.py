@@ -11,7 +11,7 @@ from Visualizator import visualize_selected_moves
 from SVM_classifier import extract_features_to_csv
 from Functions import FrequencyFeatures
 from DT_classifier import train_DecisionTreeClassifier, train_DecisonTreeClassifier_OneHotEncodingAddition, \
-    trainOVR_DecisionTree, evaluation_statistics, trainOVR_kNN
+    trainOVR_DecisionTree, evaluation_statistics, trainOVR_kNN, train_OVR_DT
 
 
 def filtering_n_segmenting_signals():
@@ -126,6 +126,9 @@ if __name__ == '__main__':
     # data=df_plot_normalized['Sum'].values
 
     # ---------------------------------------------------------------------------------
+    directory = 'features_for_training.csv'
+    treemodel = train_OVR_DT(directory)
+    #print(DTCcheck())
 
-    print(DTCcheck())
+
 
