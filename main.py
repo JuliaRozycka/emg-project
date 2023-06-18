@@ -1,6 +1,7 @@
 from Feature import Feature
 from FeatureExtractor import extract_features, extract_feature
 import os
+import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -8,9 +9,9 @@ from FeatureExtractor import extract_features
 from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files, check_if_csv, \
     normalize_data
 from Visualizator import visualize_selected_moves
-from SVM_classifier import extract_features_to_csv
+from SVM_classifier import extract_features_to_csv, train_SVM
 from DT_classifier import train_DecisionTreeClassifier, train_DecisonTreeClassifier_OneHotEncodingAddition, \
-    trainOVR_DecisionTree, evaluation_statistics, trainOVR_kNN
+    trainOVR_DecisionTree, evaluation_statistics, trainOVR_kNN, kfold
 
 def filtering_n_segmenting_signals():
     window_size = 300  # Adjust the window size based on your needs
@@ -89,7 +90,8 @@ def kNNcheck():
 
 
 if __name__ == '__main__':
-    extract_features_to_csv('features/')
+    # extracting_features()
+    # extract_features_to_csv('features/')
 
     # ---------------------------------------------------------------------------------
     # df_plot = pd.read_csv('data/o1/p1/o1_p1_1.csv')
@@ -147,8 +149,95 @@ if __name__ == '__main__':
 
 
     # ---------------------------------------------------------------------------------
-    directory = 'features_for_training.csv'
+    #directory = 'features_for_training.csv'
     #print(DTCcheck())
+
+
+
+    # Generacja wykresów do sprawka
+    # Set column names
+    # column_names = ["Biceps", "Triceps", "Zginacz", "Prostownik"]
+    # filename='raw_signals/osoba_5_lewa_p1.csv'
+    # # Read the csv with columns
+    # df_plot = pd.read_csv(filename, names=column_names, header=None)
+    # # Get number of rows and add times to EMG data
+    # rows = len(df_plot)
+    # time_col = np.arange(0.001, rows * 0.001 + 0.001, 0.001)
+    # df_plot['Czas'] = time_col
+    #
+    # biceps=df_plot['Biceps'].values
+    # triceps = df_plot['Triceps'].values
+    # prostownik = df_plot['Prostownik'].values
+    # zginacz = df_plot['Zginacz'].values
+    # time_plot=df_plot['Czas'].values
+    #
+    # plt.figure(1)
+    # plt.subplot(4,1,1)
+    # plt.plot(time_plot, biceps)
+    # plt.title('Biceps')
+    # plt.grid()
+    # plt.xlim(0,300)
+    # plt.xticks(list(range(0,301,25)))
+    # plt.subplot(4, 1, 2)
+    # plt.plot(time_plot, triceps)
+    # plt.title('Triceps')
+    # plt.subplot(4, 1, 3)
+    # plt.plot(time_plot, zginacz)
+    # plt.title('Zginacz')
+    # plt.subplot(4, 1, 4)
+    # plt.plot(time_plot, prostownik)
+    # plt.title('Prostownik')
+    # plt.grid()
+    #
+    # df_plot['Sum'] = df_plot['Biceps'] * 0.35 + df_plot['Triceps'] * 0.1 + df_plot['Prostownik'] * 0.2 + df_plot['Zginacz'] * 0.35
+    # signal_one = df_plot['Sum'].values
+    #
+    # plt.figure(2)
+    # plt.plot(time_plot,signal_one)
+    # plt.show()
+
+    directory = 'features_for_training.csv'
+    train_SVM(directory)
+
+    # df = pd.read_csv('features_for_training.csv')
+    #
+    # print(df.describe())
+    # print(df.isnull().sum())
+    #
+    # corr = df[df.columns].corr()
+    # sns.heatmap(corr, cmap="YlGnBu", annot=True)
+    # plt.title('Heatmap for Correlation of Parameters')
+    # plt.show()
+    #
+    # columns_to_include = list(df.columns)[:-1]
+    # fig, axes = plt.subplots(nrows=4, ncols=2, figsize=(7, 10))
+    #
+    # for i, column in enumerate(columns_to_include):
+    #     ax = axes[i // 2, i % 2]  # Get the current subplot axes
+    #     df[column].plot.hist(ax=ax, color='Pink')
+    #     ax.set_title(column)
+    #
+    # plt.tight_layout()  # Adjust spacing between subplots
+    # plt.show()
+    #
+    # sns.pairplot(df[['MAV','RMS','Class']], hue='Class')
+    # plt.show()
+    #
+    # features = list(df.columns.values)[:-1]
+    #
+    # # Visualize feature distributions
+    # for feature in features:
+    #     plt.figure(figsize=(8, 6))
+    #     sns.histplot(data=df, x=feature, hue='Class', kde=True, palette= 'hls')
+    #     sns.color_palette("Spectral", as_cmap=True)
+    #     plt.title(f"Distribution of {feature}")
+    #     plt.show()
+
+
+
+
+
+
 
 
 

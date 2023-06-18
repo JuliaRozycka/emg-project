@@ -4,6 +4,11 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report
+from sklearn.metrics import balanced_accuracy_score
+from sklearn.feature_selection import SelectKBest, chi2
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.multiclass import OneVsRestClassifier
+
 
 def extract_features_to_csv(directory):
     """
@@ -70,26 +75,35 @@ def extract_features_to_csv(directory):
 
 def train_SVM(directory: str):
 
-    feature_names = ['RMS','MAV', 'IEMG', 'VAR', 'WL', 'WAMP','FMN','FMD']
-    df = pd.read_csv(directory)
+    data = pd.read_csv(directory)
+    features = list(data.columns.values)[:-1]
+    X = data[features]
+    y = data['Class']
+    print(X.shape)
+    print(y.shape)
 
-    y = df['Class']
-    X = df.drop(['Class'])
+    scaler = MinMaxScaler()
+    X_scaled = scaler.fit_transform(X)
 
+    select = SelectKBest(chi2, k=6)
+    X_new = select.fit_transform(X_scaled, y)
 
-    # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X_new,y,test_size=0.2,random_state=42)
 
-    # Create an SVM classifier
     svm = SVC()
+    model = OneVsRestClassifier(svm)
 
-    # Train the SVM classifier
-    svm.fit(X_train, y_train)
+    model.fit(X_train,y_train)
 
-    # Make predictions on the test set
-    y_pred = svm.predict(X_test)
+    prediction = model.predict(X_test)
+    balanced_accuracy = balanced_accuracy_score(y_test, prediction)
+    print("Balanced Accuracy:", balanced_accuracy)
 
-    # Print classification report
-    print(classification_report(y_test, y_pred))
 
-    return y_pred
+
+
+
+
+
+
+

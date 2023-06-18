@@ -224,5 +224,6 @@ def time_to_frequency_domain(signal):
     amplitude = rfft(signal)
     frequency = rfftfreq(len(signal), 1 / sample_rate)
 
+
     return amplitude, frequency
 
