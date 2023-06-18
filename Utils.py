@@ -1,11 +1,13 @@
-from pandas import DataFrame
-import pandas as pd
-import numpy as np
-import os
 import json
-from Visualizator import save_plot
+import os
 import re
+
+import numpy as np
+import pandas as pd
+from pandas import DataFrame
 from scipy.fft import fft, ifft, rfft, rfftfreq
+
+from Visualizator import save_plot
 
 
 def read_data(filename: str, cutoff_frequency) -> DataFrame:
@@ -127,6 +129,7 @@ def save_segments_to_files(osoba: int, pomiar: int, data: DataFrame, movements: 
 
     filtered_df.to_csv(f"{directory}/o{osoba}_p{pomiar}_0.csv", index=False)
 
+
 def check_if_csv(filename: str) -> bool:
     """
     Functions used to check if file is a csv file
@@ -153,6 +156,7 @@ def count_files_in_folders(directory):
 
         # Print the result
         print(f"Folder {folder_name}: {file_count} files")
+
 
 def search_for_min_max(osoba: int, pomiar: int):
     """
@@ -216,7 +220,7 @@ def normalize_data(filename):
 
     normalized.to_csv(f'{directory}o{osoba}_p{pomiar}_{ruch}.csv', index=False)
 
-    return  normalized
+    return normalized
 
 
 def time_to_frequency_domain(signal):
@@ -225,4 +229,3 @@ def time_to_frequency_domain(signal):
     frequency = rfftfreq(len(signal), 1 / sample_rate)
 
     return amplitude, frequency
-

@@ -1,44 +1,51 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 from Utils import time_to_frequency_domain
 
 
 def fRootMeanSquare(data):
     fRMS = np.sqrt(np.mean(np.power(data, 2)))
     return fRMS
+
+
 def fMeanAbsoluteValue(data):
     fMAV = np.mean(np.abs(data))
     return fMAV
+
 
 def fIntegrated(data):
     fIEMG = np.sum(np.abs(data))
     return fIEMG
 
+
 def fVariance(data):
     fVAR = np.var(data)
     return fVAR
+
 
 def fSimpleSquareIntegral(data):
     fSSI = np.sum(np.power(data, 2))
     return fSSI
 
+
 def fWillisonAmplitude(data):
-    fWAMP=np.sum(np.abs(np.diff(data)) > 0.01)
+    fWAMP = np.sum(np.abs(np.diff(data)) > 0.01)
     return fWAMP
 
+
 def fWaveformLength(data):
-    fWL=np.sum(np.abs(np.diff(data)))
+    fWL = np.sum(np.abs(np.diff(data)))
     return fWL
+
 
 def fMeanFrequency(data, plot: bool = False):
     amplitude, frequency = time_to_frequency_domain(data)
-    psd = amplitude ** 2  # Power spectrum density
+    nonzero_indices = np.where(frequency > 0.01)
+    amplitude = amplitude[nonzero_indices]
+    frequency = frequency[nonzero_indices]
+    psd = np.abs(amplitude) ** 2  # Power spectrum density
 
-    cumulative_sum = np.cumsum(psd)  # The sum of a given sequence that is increasing
-
-    frequency_median = frequency[np.where(cumulative_sum > np.max(cumulative_sum) / 2)[0][
-        0]]  # Median is frequency that splits PSD into two identical parts
-    # MDF should use cumsum on the psd and we find were the cumsum is at max(cumsum/2)
     frequency_mean = np.sum(frequency * psd) / np.sum(psd)  # Mean calculating as usual
 
     if plot is True:
@@ -58,6 +65,9 @@ def fMeanFrequency(data, plot: bool = False):
 
 def fMedianFrequency(data, plot: bool = False):
     amplitude, frequency = time_to_frequency_domain(data)
+    nonzero_indices = np.where(frequency > 0.01)
+    amplitude = amplitude[nonzero_indices]
+    frequency = frequency[nonzero_indices]
     psd = np.abs(amplitude) ** 2  # Power spectrum density
 
     cumulative_sum = np.cumsum(psd)  # The sum of a given sequence that is increasing
