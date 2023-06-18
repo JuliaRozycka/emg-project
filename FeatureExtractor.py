@@ -85,3 +85,37 @@ def extract_features(filename, save_to_classes: bool = False):
         feature_df.to_csv(f"{directory}/{uid}-o{person}p{measurement}.csv", index=False)
 
     return feature_df
+
+
+def extract_features_to_csv(directory):
+
+    # directory  is features/
+    # iterate over folders 1-18 in features
+    df = pd.DataFrame(columns=['RMS','MAV','IEMG','VAR','WL','WAMP','FMN','FMD','Class'])
+
+    for _class in range(1,19):
+        class_path = os.path.join(directory, str(_class))
+        for file in os.listdir(class_path):
+            f = os.path.join(class_path, file)
+            if os.path.isfile(f):
+                extracted_features = pd.read_csv(f)
+
+                row = [
+                    extracted_features['RMS'].values[0],
+                    extracted_features['MAV'].values[0],
+                    extracted_features['IEMG'].values[0],
+                    extracted_features['VAR'].values[0],
+                    extracted_features['WL'].values[0],
+                    extracted_features['WAMP'].values[0],
+                    extracted_features['FMN'].values[0],
+                    extracted_features['FMD'].values[0],
+                    int(_class)
+                ]
+
+                df.loc[len(df)] = row
+
+            #break
+            # Break after reading first file - to jest do usunięcia jak ustalimy co bierzemy za faetures i czy lista czy co, bo wsm tak sobie
+            # myślę że niepotzrebnie chyba bierzemy tyle podobnych features z time domain, można wywalić jakieś 3 i dodać 2 z frequency domain
+    df.to_csv('features_for_training.csv', index=False)
+    return df

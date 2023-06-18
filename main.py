@@ -1,3 +1,5 @@
+from sklearn.svm import SVC
+
 from Feature import Feature
 from FeatureExtractor import extract_features, extract_feature
 import os
@@ -8,11 +10,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from FeatureExtractor import extract_features
+from FeatureExtractor import extract_features, extract_features_to_csv
 from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files, check_if_csv, \
     normalize_data
 from Visualizator import visualize_selected_moves
-from SVM_classifier import extract_features_to_csv
 from DT_classifier import Validation_and_Classification, Plot_tree_model, evaluation_statistics
 
 
@@ -90,11 +91,20 @@ def normalizing_data():
 #     print('Separate statistics: ', '\n', evaluation_of_knn[0])
 #     print('Full package statistics: ', '\n', evaluation_of_knn[2])
 #     print('Full package statistics (but the df): ', '\n', evaluation_of_knn[1])
+def Train_SVM():
+    directory = 'features_for_training.csv'
+    clf=SVC(kernel='rbf',C=25,gamma='scale')
+    svm_model=Validation_and_Classification(directory,clf,6)
+
+    print('Balanced accuracy scores: ', svm_model[0])
+    print('F1 scores: ', svm_model[1])
+    print('Precision scores: ', svm_model[2])
+    print('Recall scores: ', svm_model[3])
 
 def Train_Decision_Tree():
     directory = 'features_for_training.csv'
     clf=DecisionTreeClassifier(max_depth=4,random_state=10)
-    tree_model=Validation_and_Classification(directory,clf,5)
+    tree_model=Validation_and_Classification(directory,clf,6)
 
     print('Balanced accuracy scores: ', tree_model[0])
     print('F1 scores: ', tree_model[1])
@@ -105,7 +115,7 @@ def Train_Decision_Tree():
 def Train_KNN():
     directory = 'features_for_training.csv'
     clf = KNeighborsClassifier(n_neighbors=6)
-    knn_model = Validation_and_Classification(directory, clf, 5)
+    knn_model = Validation_and_Classification(directory, clf, 6)
 
     print('Balanced accuracy scores: ', knn_model[0])
     print('F1 scores: ', knn_model[1])
@@ -182,6 +192,9 @@ if __name__ == '__main__':
 
     print('K-NEAREST NEIGHBOUR METRICS: ')
     Train_KNN()
+
+    print('SVM METRICS: ')
+    Train_SVM()
 
 
 
@@ -296,8 +309,7 @@ if __name__ == '__main__':
     # plt.plot(time_plot,signal_one)
     # plt.show()
 
-    directory = 'features_for_training.csv'
-    train_SVM(directory)
+
 
     # df = pd.read_csv('features_for_training.csv')
     #

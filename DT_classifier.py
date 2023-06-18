@@ -25,7 +25,6 @@ def Plot_tree_model(tree_model):
     graph = graphviz.Source(dot_data)
 
 
-
 def evaluation_statistics(y_test, prediction):
     accuracy = accuracy_score(y_test, prediction)
     f1 = f1_score(y_test, prediction, average='weighted')
@@ -41,7 +40,8 @@ def evaluation_statistics(y_test, prediction):
 
     return eval_stats, eval_raport, full_stats
 
-def Validation_and_Classification(directory: str , classifier, best_feature_amount: int):
+
+def Validation_and_Classification(directory: str, classifier, best_feature_amount: int):
     df = pd.read_csv(directory)
     X = df[['RMS', 'MAV', 'IEMG', 'VAR', 'WL', 'WAMP', 'FMN', 'FMD']].values
     y = df['Class']
@@ -51,14 +51,14 @@ def Validation_and_Classification(directory: str , classifier, best_feature_amou
     select = SelectKBest(chi2, k=best_feature_amount)
     X_new = select.fit_transform(X_scaled, y)
 
-    rskf=RepeatedStratifiedKFold(n_splits=5,n_repeats=1,random_state=None)
+    rskf = RepeatedStratifiedKFold(n_splits=5, n_repeats=5, random_state=None)
     ovr_clf = OneVsRestClassifier(classifier)
 
-    bal_acc_scores=[]
-    f1_scores=[]
-    precision_scores=[]
-    recall_scores=[]
-    full_metrics=[]
+    bal_acc_scores = []
+    f1_scores = []
+    precision_scores = []
+    recall_scores = []
+    full_metrics = []
 
     for fold_index, (train_index, test_index) in enumerate(rskf.split(X_new, y)):
         x_train, x_test = X_new[train_index], X_new[test_index]
@@ -69,11 +69,11 @@ def Validation_and_Classification(directory: str , classifier, best_feature_amou
         prediction = ovr_clf.predict(x_test)
 
         # Evaluation metrics
-        bal_acc_scores.append(balanced_accuracy_score(y_test,prediction))
-        f1_scores.append(f1_score(y_test, prediction, average='weighted',zero_division=0))
-        precision_scores.append(precision_score(y_test, prediction, average='weighted',zero_division=0))
+        bal_acc_scores.append(balanced_accuracy_score(y_test, prediction))
+        f1_scores.append(f1_score(y_test, prediction, average='weighted', zero_division=0))
+        precision_scores.append(precision_score(y_test, prediction, average='weighted', zero_division=0))
         recall_scores.append(recall_score(y_test, prediction, average='weighted'))
-        full_metrics.append(classification_report(y_test, prediction,zero_division=0))
+        full_metrics.append(classification_report(y_test, prediction, zero_division=0))
         # Confusion matrix
         classes = range(1, 19)
         fig, axes = plt.subplots(3, 6, figsize=(12, 6))
@@ -83,7 +83,7 @@ def Validation_and_Classification(directory: str , classifier, best_feature_amou
             class_test = (y_test == i)
             class_prediction = (prediction == i)
             cm = confusion_matrix(class_test, class_prediction)
-            #print(f'Confusion matrix for {i} label/class: {cm}')
+            # print(f'Confusion matrix for {i} label/class: {cm}')
             disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['rest', i])
             axi = axes[r, c]
             axi.set_title(i)
@@ -98,7 +98,6 @@ def Validation_and_Classification(directory: str , classifier, best_feature_amou
     # eval_metrics= pd.DataFrame({
     #     'Balanced accuracy': bal_acc_scores, 'F1 score': f1_scores, 'Precision': precision_scores, 'Recall': recall_scores}, index=[0])
     # eval_raport= pd.DataFrame({'Classification report': full_metrics}, index=[0])
-    plt.show()
-
+    #plt.show()
 
     return bal_acc_scores, f1_scores, precision_scores, recall_scores, full_metrics
