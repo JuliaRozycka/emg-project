@@ -1,18 +1,15 @@
 import os
 import re
 import uuid
-import numpy as np
+
 import pandas as pd
+
 from Feature import Feature
-from scipy.fft import rfft, rfftfreq
-import matplotlib.pyplot as plt
-from Functions import fVariance, fIntegrated, fSimpleSquareIntegral, fRootMeanSquare, fMeanAbsoluteValue, \
+from Functions import fVariance, fIntegrated, fRootMeanSquare, fMeanAbsoluteValue, \
     fWaveformLength, fWillisonAmplitude, fMeanFrequency, fMedianFrequency
 
 
-
 def extract_feature(filename: str, feature: Feature):
-
     """
     #     Function extracting specific feature from file
     #
@@ -21,7 +18,7 @@ def extract_feature(filename: str, feature: Feature):
     #     :return: extracted feature
     #     """
 
-    #Load the signal from the file
+    # Load the signal from the file
     data = pd.read_csv(filename)
     signal = data['Sum'].values
 
@@ -45,6 +42,7 @@ def extract_feature(filename: str, feature: Feature):
         raise ValueError("Incorrect feature")
     return x
 
+
 def extract_features(filename, save_to_classes: bool = False):
     """
     Function to extract all features from file and saving the data into 18 classes
@@ -64,8 +62,7 @@ def extract_features(filename, save_to_classes: bool = False):
 
     feature_df = pd.DataFrame(
         {'RMS': rms_feature, 'MAV': mav_feature, 'IEMG': iemg_feature, 'VAR': var_feature,
-         'WL': wl_feature, 'WAMP': wamp_feature, 'FMN':fmn_feature,'FMD':fmd_feature}, index=[0])
-
+         'WL': wl_feature, 'WAMP': wamp_feature, 'FMN': fmn_feature, 'FMD': fmd_feature}, index=[0])
 
     # Extract the number x from the filename using regular expression
     x = re.search(r"o(\d+)_p(\d+)_(\d+)\.csv$", filename)
@@ -88,12 +85,11 @@ def extract_features(filename, save_to_classes: bool = False):
 
 
 def extract_features_to_csv(directory):
-
     # directory  is features/
     # iterate over folders 1-18 in features
-    df = pd.DataFrame(columns=['RMS','MAV','IEMG','VAR','WL','WAMP','FMN','FMD','Class'])
+    df = pd.DataFrame(columns=['RMS', 'MAV', 'IEMG', 'VAR', 'WL', 'WAMP', 'FMN', 'FMD', 'Class'])
 
-    for _class in range(1,19):
+    for _class in range(1, 19):
         class_path = os.path.join(directory, str(_class))
         for file in os.listdir(class_path):
             f = os.path.join(class_path, file)
@@ -114,7 +110,7 @@ def extract_features_to_csv(directory):
 
                 df.loc[len(df)] = row
 
-            #break
+            # break
             # Break after reading first file - to jest do usunięcia jak ustalimy co bierzemy za faetures i czy lista czy co, bo wsm tak sobie
             # myślę że niepotzrebnie chyba bierzemy tyle podobnych features z time domain, można wywalić jakieś 3 i dodać 2 z frequency domain
     df.to_csv('features_for_training.csv', index=False)

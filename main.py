@@ -14,7 +14,7 @@ from FeatureExtractor import extract_features, extract_features_to_csv
 from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files, check_if_csv, \
     normalize_data
 from Visualizator import visualize_selected_moves
-from DT_classifier import Validation_and_Classification, Plot_tree_model, evaluation_statistics
+from Classifier import Validation_and_Classification, Plot_tree_model, evaluation_statistics
 
 
 def filtering_n_segmenting_signals():

@@ -32,7 +32,7 @@ def visualize_selected_moves(data: DataFrame, movements: [], show: bool = True):
     mpl.rcParams['font.serif'] = ['Times New Roman']
     mpl.rcParams['font.size'] = 10
 
-    fig, axs = plt.subplots(2,1)
+    fig, axs = plt.subplots(2, 1)
 
     xfd = data['Czas'].values
     yfd = data['Sum'].values
