@@ -3,22 +3,25 @@ from FeatureExtractor import extract_features, extract_feature
 import os
 import seaborn as sns
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from FeatureExtractor import extract_features
 from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files, check_if_csv, \
     normalize_data
 from Visualizator import visualize_selected_moves
-from SVM_classifier import extract_features_to_csv, train_SVM
-from DT_classifier import train_DecisionTreeClassifier, train_DecisonTreeClassifier_OneHotEncodingAddition, \
-    trainOVR_DecisionTree, evaluation_statistics, trainOVR_kNN, kfold
+from SVM_classifier import extract_features_to_csv
+from DT_classifier import Validation_and_Classification, Plot_tree_model, evaluation_statistics
+
 
 def filtering_n_segmenting_signals():
-    window_size = 300  # Adjust the window size based on your needs
-    threshold = 0.0017  # Adjust the threshold factor based on your needs
+    window_size = 800  # Adjust the window size based on your needs
+    threshold = 0.003  # Adjust the threshold factor based on your needs
     cutoff = 100  # Cutoff value in Hz
 
-    nazwa_pliku = 'dane_testowe.csv'
+    nazwa_pliku = 'osoba_6_lewa_p2.csv'
 
     data = read_data(f'raw_signals/{nazwa_pliku}', cutoff)
 
@@ -34,7 +37,7 @@ def filtering_n_segmenting_signals():
     visualize_selected_moves(data, hand_movements)
 
     # zapisywanie od plików,
-    save_segments_to_files(1, 2, data, hand_movements, metadata, savefig=True)
+    # save_segments_to_files(1, 2, data, hand_movements, metadata, savefig=True)
 
 
 def extracting_features():
@@ -66,39 +69,59 @@ def normalizing_data():
                 print(f'{csv_name} normalized')
 
 
-def DTCcheck():
-    directory='features_for_training.csv'
-    treemodel=trainOVR_DecisionTree(directory)
-    y_test=treemodel[1]
-    prediction=treemodel[2]
-    evaluation_of_tree=evaluation_statistics(y_test,prediction)
+# def DTCcheck():
+#     directory='features_for_training.csv'
+#     treemodel=trainOVR_DecisionTree(directory)
+#     y_test=treemodel[1]
+#     prediction=treemodel[2]
+#     evaluation_of_tree=evaluation_statistics(y_test,prediction)
+#
+#     print('Separate statistics: ', '\n', evaluation_of_tree[0])
+#     print('Full package statistics: ','\n', evaluation_of_tree[2])
+#     print('Full package statistics (but the df): ', '\n', evaluation_of_tree[1])
+#
+# def kNNcheck():
+#     directory='features_for_training.csv'
+#     knnmodel = trainOVR_kNN(directory)
+#     y_test = knnmodel[1]
+#     prediction = knnmodel[2]
+#     evaluation_of_knn = evaluation_statistics(y_test, prediction)
+#
+#     print('Separate statistics: ', '\n', evaluation_of_knn[0])
+#     print('Full package statistics: ', '\n', evaluation_of_knn[2])
+#     print('Full package statistics (but the df): ', '\n', evaluation_of_knn[1])
 
-    print('Separate statistics: ', '\n', evaluation_of_tree[0])
-    print('Full package statistics: ','\n', evaluation_of_tree[2])
-    print('Full package statistics (but the df): ', '\n', evaluation_of_tree[1])
+def Train_Decision_Tree():
+    directory = 'features_for_training.csv'
+    clf=DecisionTreeClassifier(max_depth=4,random_state=10)
+    tree_model=Validation_and_Classification(directory,clf,5)
 
-def kNNcheck():
-    directory='features_for_training.csv'
-    knnmodel = trainOVR_kNN(directory)
-    y_test = knnmodel[1]
-    prediction = knnmodel[2]
-    evaluation_of_knn = evaluation_statistics(y_test, prediction)
+    print('Balanced accuracy scores: ', tree_model[0])
+    print('F1 scores: ', tree_model[1])
+    print('Precision scores: ', tree_model[2])
+    print('Recall scores: ', tree_model[3])
 
-    print('Separate statistics: ', '\n', evaluation_of_knn[0])
-    print('Full package statistics: ', '\n', evaluation_of_knn[2])
-    print('Full package statistics (but the df): ', '\n', evaluation_of_knn[1])
 
+def Train_KNN():
+    directory = 'features_for_training.csv'
+    clf = KNeighborsClassifier(n_neighbors=6)
+    knn_model = Validation_and_Classification(directory, clf, 5)
+
+    print('Balanced accuracy scores: ', knn_model[0])
+    print('F1 scores: ', knn_model[1])
+    print('Precision scores: ', knn_model[2])
+    print('Recall scores: ', knn_model[3])
 
 if __name__ == '__main__':
-    # extracting_features()
-    # extract_features_to_csv('features/')
 
     # ---------------------------------------------------------------------------------
+    # mpl.rcParams['font.family'] = 'serif'
+    # mpl.rcParams['font.serif'] = ['Times New Roman']
+    # mpl.rcParams['font.size'] = 10
     # df_plot = pd.read_csv('data/o1/p1/o1_p1_1.csv')
     # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_1.csv')
-    #
     # figs, axs = plt.subplots(2, 1)
-    #
+    # plt.subplots_adjust(hspace=0.3)
     # sum1 = df_plot['Sum'].values
     # time1 = df_plot['Czas'].values
     #
@@ -106,24 +129,29 @@ if __name__ == '__main__':
     # time2 = df_plot_normalized['Czas'].values
     #
     # axs[0].plot(time1, sum1)
-    # axs[0].set_title('Raw')
+    # axs[0].set_title('Segment przed normalizacją')
+    # axs[0].grid()
+    # axs[0].set_xlabel('Czas [s]')
+    # axs[0].set_ylabel('Amplituda [mV]')
     # axs[1].plot(time2, sum2)
-    # axs[1].set_title('Normalized')
+    # axs[1].set_title('Segment po normalizacji')
+    # axs[1].set_xlabel('Czas [s]')
+    # axs[1].set_ylabel('Amplituda [mV]')
+    # axs[1].grid()
     #
     # plt.show()
 
     # ---------------------------------------------------------------------------------
     # extraction_process=extracting_features()
     # print('Extraction is done')
-
     # ---------------------------------------------------------------------------------
     # root_dir = "features/"
     # df_test_list=extract_features_to_csv(root_dir)
-    # df_test_list.to_csv('DataLearningSet',index=False)
-    # print(df_test_list)
-
+    # ---------------------------------------------------------------------------------
     # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_3.csv')
     # data=df_plot_normalized['Sum'].values
+
+    # extract_feature('normalized_data/o4/p2/o4_p2_4.csv', Feature.FMD)
     # root_dir = "features/"
     # extract_features_to_csv(root_dir)
     # df = pd.read_csv('features_for_training.csv')
@@ -144,13 +172,85 @@ if __name__ == '__main__':
     # plt.show()
 
 
+    ## Balanced accuracy , kfoldwalidacja
+    # Select best feature (domyślnie anova, test stats -> chi square) ewentualnie PCA, ale to będzie prostsze
+    # Im wyższe p value tym większe związanie, skorelowanie
 
+    # ---------------------------------------------------------------------------------
+    print('DECISION TREE CLASSIFICATION METRICS: ')
+    Train_Decision_Tree()
+
+    print('K-NEAREST NEIGHBOUR METRICS: ')
+    Train_KNN()
 
 
 
     # ---------------------------------------------------------------------------------
-    #directory = 'features_for_training.csv'
-    #print(DTCcheck())
+
+    # # Set column names
+    # column_names = ["Biceps", "Triceps", "Zginacz", "Prostownik"]
+    # filename='raw_signals/osoba_6_lewa_p2.csv'
+    # # Read the csv with columns
+    # df = pd.read_csv(filename, names=column_names, header=None)
+    #
+    # # Get number of rows and add times to EMG data
+    # rows = len(df)
+    # time_col = np.arange(0.001, rows * 0.001 + 0.001, 0.001)
+    # df['Czas'] = time_col
+    # df['Sum'] = df['Biceps'] * 0.35 + df['Triceps'] * 0.1 + df['Prostownik'] * 0.2 + df['Zginacz'] * 0.35
+    #
+    # biceps=df['Biceps'].values
+    # triceps = df['Triceps'].values
+    # zginacz = df['Zginacz'].values
+    # prostownik = df['Prostownik'].values
+    # czas=df['Czas'].values
+    # one_signal = df['Sum'].values
+    #
+    # plt.figure(1)
+    # plt.subplot(4,1,1)
+    # plt.plot(czas,biceps,'b')
+    # plt.grid()
+    # plt.xlim(0,301)
+    # plt.xticks(np.arange(0,301,25))
+    # plt.title('Mięsień dwugłowy ramienia - Biceps')
+    # plt.xlabel('Czas [s]')
+    # plt.ylabel('Amplituda [mV]')
+    # plt.subplot(4, 1, 2)
+    # plt.plot(czas, triceps,'r')
+    # plt.grid()
+    # plt.xlim(0, 301)
+    # plt.xticks(np.arange(0,301,25))
+    # plt.title('Mięsień trójgłowy ramienia - Triceps')
+    # plt.xlabel('Czas [s]')
+    # plt.ylabel('Amplituda [mV]')
+    # plt.subplot(4, 1, 3)
+    # plt.plot(czas, zginacz,'g')
+    # plt.grid()
+    # plt.xlim(0, 301)
+    # plt.xticks(np.arange(0,301,25))
+    # plt.title('Zginacz łokciowy nadgarstka')
+    # plt.xlabel('Czas [s]')
+    # plt.ylabel('Amplituda [mV]')
+    # plt.subplot(4, 1, 4)
+    # plt.plot(czas, prostownik,'m')
+    # plt.grid()
+    # plt.xlim(0, 301)
+    # plt.xticks(np.arange(0,301,25))
+    # plt.title('Prostownik palców')
+    # plt.xlabel('Czas [s]')
+    # plt.ylabel('Amplituda [mV]')
+    # plt.subplots_adjust(hspace=0.6)
+    #
+    # plt.figure(2)
+    # plt.plot(czas,one_signal,'b')
+    # plt.grid()
+    # plt.xlim(0, 301)
+    # plt.xticks(np.arange(0,301,25))
+    # plt.title('Zsumowany sygnał')
+    # plt.xlabel('Czas [s]')
+    # plt.ylabel('Amplituda [mV]')
+    #
+    # plt.show()
 
 
 
