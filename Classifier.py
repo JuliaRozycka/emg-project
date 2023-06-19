@@ -1,13 +1,11 @@
 import graphviz
 import pandas as pd
 import matplotlib.pyplot as plt
-
 from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.model_selection import RepeatedStratifiedKFold
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, \
-    roc_auc_score, classification_report, roc_curve, confusion_matrix, ConfusionMatrixDisplay, balanced_accuracy_score
+    classification_report, confusion_matrix, ConfusionMatrixDisplay, balanced_accuracy_score
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.tree import plot_tree, export_graphviz
 
@@ -30,8 +28,6 @@ def evaluation_statistics(y_test, prediction):
     f1 = f1_score(y_test, prediction, average='weighted')
     precision = precision_score(y_test, prediction, average='weighted')
     recall = recall_score(y_test, prediction, average='weighted')
-    # roc_auc = roc_auc_score(y_test, prediction, average='weighted', multi_class='ovr')
-    # roc = roc_curve(y_test, prediction)
     full_stats = classification_report(y_test, prediction)
 
     eval_stats = pd.DataFrame({
@@ -74,6 +70,7 @@ def Validation_and_Classification(directory: str, classifier, best_feature_amoun
         precision_scores.append(precision_score(y_test, prediction, average='weighted', zero_division=0))
         recall_scores.append(recall_score(y_test, prediction, average='weighted'))
         full_metrics.append(classification_report(y_test, prediction, zero_division=0))
+
         # Confusion matrix
         classes = range(1, 19)
         fig, axes = plt.subplots(3, 6, figsize=(12, 6))
@@ -98,6 +95,6 @@ def Validation_and_Classification(directory: str, classifier, best_feature_amoun
     # eval_metrics= pd.DataFrame({
     #     'Balanced accuracy': bal_acc_scores, 'F1 score': f1_scores, 'Precision': precision_scores, 'Recall': recall_scores}, index=[0])
     # eval_raport= pd.DataFrame({'Classification report': full_metrics}, index=[0])
-    #plt.show()
+    # plt.show()
 
     return bal_acc_scores, f1_scores, precision_scores, recall_scores, full_metrics

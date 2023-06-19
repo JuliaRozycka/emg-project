@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
+from scipy.stats import normaltest, shapiro
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from FeatureExtractor import extract_features, extract_features_to_csv
@@ -111,7 +112,6 @@ def Train_Decision_Tree():
     print('Precision scores: ', tree_model[2])
     print('Recall scores: ', tree_model[3])
 
-
 def Train_KNN():
     directory = 'features_for_training.csv'
     clf = KNeighborsClassifier(n_neighbors=6)
@@ -121,6 +121,24 @@ def Train_KNN():
     print('F1 scores: ', knn_model[1])
     print('Precision scores: ', knn_model[2])
     print('Recall scores: ', knn_model[3])
+
+def normal_distribution_check(data: pd.DataFrame):
+    '''
+     Dla liczebności populacji powyżej 20 stosujemy test D’Agostino–Pearsoa (normaltest)
+     Dla liczebności populacji poniżej 20 stosujemy test SHapiro-Wilka (shapiro)
+    :param data:
+    :return:
+    '''
+    if len(data)>=20:
+        stats, p =normaltest(data)
+    else:
+        stats, p = shapiro(data)
+
+    if p > 0.05:
+        isnormal=True
+    else:
+        isnormal=False
+    return stats, p, isnormal
 
 if __name__ == '__main__':
 
@@ -190,11 +208,11 @@ if __name__ == '__main__':
     print('DECISION TREE CLASSIFICATION METRICS: ')
     Train_Decision_Tree()
 
-    print('K-NEAREST NEIGHBOUR METRICS: ')
-    Train_KNN()
-
-    print('SVM METRICS: ')
-    Train_SVM()
+    # print('K-NEAREST NEIGHBOUR METRICS: ')
+    # Train_KNN()
+    #
+    # print('SVM METRICS: ')
+    # Train_SVM()
 
 
 
