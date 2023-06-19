@@ -1,5 +1,11 @@
 from sklearn.svm import SVC
 
+from Classifiers import Classifiers
+from Statistics import normal_distribution_check, boxplot, manova
+from scipy import stats
+from statsmodels.multivariate.manova import MANOVA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as lda
+
 from Feature import Feature
 from FeatureExtractor import extract_features, extract_feature
 import os
@@ -45,8 +51,6 @@ def filtering_n_segmenting_signals():
 def extracting_features():
     rootdir = 'normalized_data/'
 
-
-
     for subdir, dirs, files in os.walk(rootdir):
         for file in files:
             csv_name = os.path.join(subdir, file)
@@ -57,7 +61,7 @@ def extracting_features():
     root_dir = "features/"
 
     # Create an empty list to store MAV data
-    #mav_data = []
+    # mav_data = []
 
 
 def normalizing_data():
@@ -70,47 +74,41 @@ def normalizing_data():
                 df = normalize_data(csv_name)
                 print(f'{csv_name} normalized')
 
-
-# def DTCcheck():
-#     directory='features_for_training.csv'
-#     treemodel=trainOVR_DecisionTree(directory)
-#     y_test=treemodel[1]
-#     prediction=treemodel[2]
-#     evaluation_of_tree=evaluation_statistics(y_test,prediction)
-#
-#     print('Separate statistics: ', '\n', evaluation_of_tree[0])
-#     print('Full package statistics: ','\n', evaluation_of_tree[2])
-#     print('Full package statistics (but the df): ', '\n', evaluation_of_tree[1])
-#
-# def kNNcheck():
-#     directory='features_for_training.csv'
-#     knnmodel = trainOVR_kNN(directory)
-#     y_test = knnmodel[1]
-#     prediction = knnmodel[2]
-#     evaluation_of_knn = evaluation_statistics(y_test, prediction)
-#
-#     print('Separate statistics: ', '\n', evaluation_of_knn[0])
-#     print('Full package statistics: ', '\n', evaluation_of_knn[2])
-#     print('Full package statistics (but the df): ', '\n', evaluation_of_knn[1])
 def Train_SVM():
     directory = 'features_for_training.csv'
-    clf=SVC(kernel='rbf',C=25,gamma='scale')
-    svm_model=Validation_and_Classification(directory,clf,6)
+    clf = SVC(kernel='rbf', C=25, gamma='scale')
+    svm_model = Validation_and_Classification(directory, clf, 6)
 
     print('Balanced accuracy scores: ', svm_model[0])
     print('F1 scores: ', svm_model[1])
     print('Precision scores: ', svm_model[2])
     print('Recall scores: ', svm_model[3])
 
+    df = pd.DataFrame(columns=['bal_acc', 'f1_score', 'precision', 'recall'])
+    df['bal_acc'] = svm_model[0]
+    df['f1_score'] = svm_model[1]
+    df['precision'] = svm_model[2]
+    df['recall'] = svm_model[3]
+
+    df.to_csv('metrics/svm_metrics.csv', index=False)
+
+
 def Train_Decision_Tree():
     directory = 'features_for_training.csv'
-    clf=DecisionTreeClassifier(max_depth=4,random_state=10)
-    tree_model=Validation_and_Classification(directory,clf,6)
+    clf = DecisionTreeClassifier(max_depth=4, random_state=10)
+    tree_model = Validation_and_Classification(directory, clf, 6)
 
     print('Balanced accuracy scores: ', tree_model[0])
     print('F1 scores: ', tree_model[1])
     print('Precision scores: ', tree_model[2])
     print('Recall scores: ', tree_model[3])
+    df = pd.DataFrame(columns=['bal_acc', 'f1_score', 'precision', 'recall'])
+    df['bal_acc'] = tree_model[0]
+    df['f1_score'] = tree_model[1]
+    df['precision'] = tree_model[2]
+    df['recall'] = tree_model[3]
+
+    df.to_csv('metrics/dt_metrics.csv', index=False)
 
 def Train_KNN():
     directory = 'features_for_training.csv'
@@ -122,25 +120,23 @@ def Train_KNN():
     print('Precision scores: ', knn_model[2])
     print('Recall scores: ', knn_model[3])
 
-def normal_distribution_check(data: pd.DataFrame):
-    '''
-     Dla liczebności populacji powyżej 20 stosujemy test D’Agostino–Pearsoa (normaltest)
-     Dla liczebności populacji poniżej 20 stosujemy test SHapiro-Wilka (shapiro)
-    :param data:
-    :return:
-    '''
-    if len(data)>=20:
-        stats, p =normaltest(data)
-    else:
-        stats, p = shapiro(data)
+    df = pd.DataFrame(columns=['bal_acc', 'f1_score', 'precision', 'recall'])
+    df['bal_acc'] = knn_model[0]
+    df['f1_score'] = knn_model[1]
+    df['precision'] = knn_model[2]
+    df['recall'] = knn_model[3]
 
-    if p > 0.05:
-        isnormal=True
-    else:
-        isnormal=False
-    return stats, p, isnormal
+    df.to_csv('metrics/knn_metrics.csv', index=False)
+
+
+def check_distribution(directory: str):
+    data = pd.read_csv(directory)
+    for columns in list(data.columns.values):
+        print(columns, normal_distribution_check(data[columns]))
+
 
 if __name__ == '__main__':
+    pass
 
     # ---------------------------------------------------------------------------------
     # mpl.rcParams['font.family'] = 'serif'
@@ -169,56 +165,29 @@ if __name__ == '__main__':
     #
     # plt.show()
 
-    # ---------------------------------------------------------------------------------
-    # extraction_process=extracting_features()
-    # print('Extraction is done')
-    # ---------------------------------------------------------------------------------
-    # root_dir = "features/"
-    # df_test_list=extract_features_to_csv(root_dir)
-    # ---------------------------------------------------------------------------------
+
     # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_3.csv')
     # data=df_plot_normalized['Sum'].values
 
-    # extract_feature('normalized_data/o4/p2/o4_p2_4.csv', Feature.FMD)
-    # root_dir = "features/"
-    # extract_features_to_csv(root_dir)
-    # df = pd.read_csv('features_for_training.csv')
-    # df = df.groupby(['Class']).FMN.mean()
-    #
-    # extract_feature('data/o2/p1/o2_p1_2.csv', Feature.FMD)
-    #
-    #
-    # dictionary = df.to_dict()
-    # keys  = list(dictionary.keys())
-    # values = list(dictionary.values())
-    # plt.xlabel("Class")
-    # plt.ylabel(df.name)
-    #
-    # plt.scatter(keys, values)
-    # plt.xlim(0,19)
-    # plt.xticks([i for i in range(1,19)])
-    # plt.show()
 
-
-    ## Balanced accuracy , kfoldwalidacja
+    # Balanced accuracy , kfoldwalidacja
     # Select best feature (domyślnie anova, test stats -> chi square) ewentualnie PCA, ale to będzie prostsze
     # Im wyższe p value tym większe związanie, skorelowanie
 
     # ---------------------------------------------------------------------------------
-    print('DECISION TREE CLASSIFICATION METRICS: ')
-    Train_Decision_Tree()
 
+    # print('DECISION TREE CLASSIFICATION METRICS: ')
+    # Train_Decision_Tree()
+    #
     # print('K-NEAREST NEIGHBOUR METRICS: ')
     # Train_KNN()
     #
     # print('SVM METRICS: ')
     # Train_SVM()
 
-
-
     # ---------------------------------------------------------------------------------
 
-    # # Set column names
+    #  Set column names
     # column_names = ["Biceps", "Triceps", "Zginacz", "Prostownik"]
     # filename='raw_signals/osoba_6_lewa_p2.csv'
     # # Read the csv with columns
@@ -283,8 +252,6 @@ if __name__ == '__main__':
     #
     # plt.show()
 
-
-
     # Generacja wykresów do sprawka
     # Set column names
     # column_names = ["Biceps", "Triceps", "Zginacz", "Prostownik"]
@@ -327,8 +294,8 @@ if __name__ == '__main__':
     # plt.plot(time_plot,signal_one)
     # plt.show()
 
-
-
+    #-------------------------------------------------------------------------------
+    # # ANALIZA OTRZYAMANYCH CECH
     # df = pd.read_csv('features_for_training.csv')
     #
     # print(df.describe())
@@ -364,10 +331,6 @@ if __name__ == '__main__':
     #     plt.show()
 
 
-
-
-
-
-
-
+    print(boxplot(Classifiers.kNN, 'recall'))
+    print(manova('bal_acc','precision'))
 
