@@ -1,4 +1,8 @@
 from sklearn.svm import SVC
+from Statistics import normal_distribution_check
+from scipy import stats
+from statsmodels.multivariate.manova import MANOVA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as lda
 
 from Feature import Feature
 from FeatureExtractor import extract_features, extract_feature
@@ -44,8 +48,6 @@ def filtering_n_segmenting_signals():
 def extracting_features():
     rootdir = 'normalized_data/'
 
-
-
     for subdir, dirs, files in os.walk(rootdir):
         for file in files:
             csv_name = os.path.join(subdir, file)
@@ -56,7 +58,7 @@ def extracting_features():
     root_dir = "features/"
 
     # Create an empty list to store MAV data
-    #mav_data = []
+    # mav_data = []
 
 
 def normalizing_data():
@@ -93,23 +95,39 @@ def normalizing_data():
 #     print('Full package statistics (but the df): ', '\n', evaluation_of_knn[1])
 def Train_SVM():
     directory = 'features_for_training.csv'
-    clf=SVC(kernel='rbf',C=25,gamma='scale')
-    svm_model=Validation_and_Classification(directory,clf,6)
+    clf = SVC(kernel='rbf', C=25, gamma='scale')
+    svm_model = Validation_and_Classification(directory, clf, 6)
 
     print('Balanced accuracy scores: ', svm_model[0])
     print('F1 scores: ', svm_model[1])
     print('Precision scores: ', svm_model[2])
     print('Recall scores: ', svm_model[3])
 
+    df = pd.DataFrame(columns=['bal_acc', 'f1_score', 'precision', 'recall'])
+    df['bal_acc'] = svm_model[0]
+    df['f1_score'] = svm_model[1]
+    df['precision'] = svm_model[2]
+    df['recall'] = svm_model[3]
+
+    df.to_csv('metrics/svm_metrics.csv', index=False)
+
+
 def Train_Decision_Tree():
     directory = 'features_for_training.csv'
-    clf=DecisionTreeClassifier(max_depth=4,random_state=10)
-    tree_model=Validation_and_Classification(directory,clf,6)
+    clf = DecisionTreeClassifier(max_depth=4, random_state=10)
+    tree_model = Validation_and_Classification(directory, clf, 6)
 
     print('Balanced accuracy scores: ', tree_model[0])
     print('F1 scores: ', tree_model[1])
     print('Precision scores: ', tree_model[2])
     print('Recall scores: ', tree_model[3])
+    df = pd.DataFrame(columns=['bal_acc', 'f1_score', 'precision', 'recall'])
+    df['bal_acc'] = tree_model[0]
+    df['f1_score'] = tree_model[1]
+    df['precision'] = tree_model[2]
+    df['recall'] = tree_model[3]
+
+    df.to_csv('metrics/dt_metrics.csv', index=False)
 
 
 def Train_KNN():
@@ -122,7 +140,23 @@ def Train_KNN():
     print('Precision scores: ', knn_model[2])
     print('Recall scores: ', knn_model[3])
 
+    df = pd.DataFrame(columns=['bal_acc', 'f1_score', 'precision', 'recall'])
+    df['bal_acc'] = knn_model[0]
+    df['f1_score'] = knn_model[1]
+    df['precision'] = knn_model[2]
+    df['recall'] = knn_model[3]
+
+    df.to_csv('metrics/knn_metrics.csv', index=False)
+
+
+def check_distribution(directory: str):
+    data = pd.read_csv(directory)
+    for columns in list(data.columns.values):
+        print(columns, normal_distribution_check(data[columns]))
+
+
 if __name__ == '__main__':
+    pass
 
     # ---------------------------------------------------------------------------------
     # mpl.rcParams['font.family'] = 'serif'
@@ -181,22 +215,19 @@ if __name__ == '__main__':
     # plt.xticks([i for i in range(1,19)])
     # plt.show()
 
-
     ## Balanced accuracy , kfoldwalidacja
     # Select best feature (domyślnie anova, test stats -> chi square) ewentualnie PCA, ale to będzie prostsze
     # Im wyższe p value tym większe związanie, skorelowanie
 
     # ---------------------------------------------------------------------------------
-    print('DECISION TREE CLASSIFICATION METRICS: ')
-    Train_Decision_Tree()
-
-    print('K-NEAREST NEIGHBOUR METRICS: ')
-    Train_KNN()
-
-    print('SVM METRICS: ')
-    Train_SVM()
-
-
+    # print('DECISION TREE CLASSIFICATION METRICS: ')
+    # Train_Decision_Tree()
+    #
+    # print('K-NEAREST NEIGHBOUR METRICS: ')
+    # Train_KNN()
+    #
+    # print('SVM METRICS: ')
+    # Train_SVM()
 
     # ---------------------------------------------------------------------------------
 
@@ -265,8 +296,6 @@ if __name__ == '__main__':
     #
     # plt.show()
 
-
-
     # Generacja wykresów do sprawka
     # Set column names
     # column_names = ["Biceps", "Triceps", "Zginacz", "Prostownik"]
@@ -309,8 +338,6 @@ if __name__ == '__main__':
     # plt.plot(time_plot,signal_one)
     # plt.show()
 
-
-
     # df = pd.read_csv('features_for_training.csv')
     #
     # print(df.describe())
@@ -345,11 +372,56 @@ if __name__ == '__main__':
     #     plt.title(f"Distribution of {feature}")
     #     plt.show()
 
+    svm = pd.read_csv('metrics/svm_metrics.csv')
+    svm = svm['bal_acc']
+    print("SVM:", svm.mean())
+    dt = pd.read_csv('metrics/dt_metrics.csv')
+    dt = dt['bal_acc']
+    print("kNN:", dt.mean())
+    print(stats.ttest_ind(svm, dt))
+    # czyli są statysczne róznice! yaya OKII
+    # powyżej jest średnia bal_accuracy
+    # czyli lepszy chyba SVM tutaj
+
+    # chciałam zobaczyć manove, mozesz poczytać czy to ma sens tutaj MANOVA
+
+    data = []
+
+    directories = ['metrics/knn_metrics.csv', 'metrics/svm_metrics.csv', 'metrics/dt_metrics.csv']
+
+    for classifier in directories:
+        # Read the metrics file
+        df = pd.read_csv(classifier)
+
+        # Extract the classifier name from the file path
+        classifier_name = classifier.split('/')[-1].split('_')[0]
+
+        for _, row in df.iterrows():
+            # Get the balanced accuracy and f1-score for each row
+            balanced_accuracy = row['bal_acc']
+            f1_score = row['f1_score']
+
+            # Create a new dictionary with the classifier name, balanced accuracy, and f1-score
+            data_row = {'Classifier': classifier_name, 'bal_acc': balanced_accuracy, 'f1_score': f1_score}
+
+            # Append the row to the data list
+            data.append(data_row)
+
+    # Convert the data list to a DataFrame
+    data = pd.DataFrame(data)
+    data.to_csv("test.csv", index=False)
+
+    fit = MANOVA.from_formula('bal_acc + f1_score ~ Classifier', data=data)
+    print(fit.mv_test())
 
 
+    X = data[["bal_acc", "f1_score"]]
+    y = data["Classifier"]
+    post_hoc = lda().fit(X=X, y=y)
 
 
-
-
-
-
+    # plot
+    X_new = pd.DataFrame(lda().fit(X=X, y=y).transform(X), columns=["lda1", "lda2"])
+    X_new["Classifier"] = data["Classifier"]
+    sns.scatterplot(data=X_new, x="lda1", y="lda2", hue=data.Classifier.tolist())
+    plt.show()
