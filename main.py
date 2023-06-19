@@ -1,5 +1,7 @@
 from sklearn.svm import SVC
-from Statistics import normal_distribution_check
+
+from Classifiers import Classifiers
+from Statistics import normal_distribution_check, boxplot, manova
 from scipy import stats
 from statsmodels.multivariate.manova import MANOVA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as lda
@@ -71,28 +73,6 @@ def normalizing_data():
                 df = normalize_data(csv_name)
                 print(f'{csv_name} normalized')
 
-
-# def DTCcheck():
-#     directory='features_for_training.csv'
-#     treemodel=trainOVR_DecisionTree(directory)
-#     y_test=treemodel[1]
-#     prediction=treemodel[2]
-#     evaluation_of_tree=evaluation_statistics(y_test,prediction)
-#
-#     print('Separate statistics: ', '\n', evaluation_of_tree[0])
-#     print('Full package statistics: ','\n', evaluation_of_tree[2])
-#     print('Full package statistics (but the df): ', '\n', evaluation_of_tree[1])
-#
-# def kNNcheck():
-#     directory='features_for_training.csv'
-#     knnmodel = trainOVR_kNN(directory)
-#     y_test = knnmodel[1]
-#     prediction = knnmodel[2]
-#     evaluation_of_knn = evaluation_statistics(y_test, prediction)
-#
-#     print('Separate statistics: ', '\n', evaluation_of_knn[0])
-#     print('Full package statistics: ', '\n', evaluation_of_knn[2])
-#     print('Full package statistics (but the df): ', '\n', evaluation_of_knn[1])
 def Train_SVM():
     directory = 'features_for_training.csv'
     clf = SVC(kernel='rbf', C=25, gamma='scale')
@@ -185,37 +165,12 @@ if __name__ == '__main__':
     #
     # plt.show()
 
-    # ---------------------------------------------------------------------------------
-    # extraction_process=extracting_features()
-    # print('Extraction is done')
-    # ---------------------------------------------------------------------------------
-    # root_dir = "features/"
-    # df_test_list=extract_features_to_csv(root_dir)
-    # ---------------------------------------------------------------------------------
+
     # df_plot_normalized = pd.read_csv('normalized_data/o1/p1/o1_p1_3.csv')
     # data=df_plot_normalized['Sum'].values
 
-    # extract_feature('normalized_data/o4/p2/o4_p2_4.csv', Feature.FMD)
-    # root_dir = "features/"
-    # extract_features_to_csv(root_dir)
-    # df = pd.read_csv('features_for_training.csv')
-    # df = df.groupby(['Class']).FMN.mean()
-    #
-    # extract_feature('data/o2/p1/o2_p1_2.csv', Feature.FMD)
-    #
-    #
-    # dictionary = df.to_dict()
-    # keys  = list(dictionary.keys())
-    # values = list(dictionary.values())
-    # plt.xlabel("Class")
-    # plt.ylabel(df.name)
-    #
-    # plt.scatter(keys, values)
-    # plt.xlim(0,19)
-    # plt.xticks([i for i in range(1,19)])
-    # plt.show()
 
-    ## Balanced accuracy , kfoldwalidacja
+    # Balanced accuracy , kfoldwalidacja
     # Select best feature (domyślnie anova, test stats -> chi square) ewentualnie PCA, ale to będzie prostsze
     # Im wyższe p value tym większe związanie, skorelowanie
 
@@ -231,7 +186,7 @@ if __name__ == '__main__':
 
     # ---------------------------------------------------------------------------------
 
-    # # Set column names
+    #  Set column names
     # column_names = ["Biceps", "Triceps", "Zginacz", "Prostownik"]
     # filename='raw_signals/osoba_6_lewa_p2.csv'
     # # Read the csv with columns
@@ -338,6 +293,8 @@ if __name__ == '__main__':
     # plt.plot(time_plot,signal_one)
     # plt.show()
 
+    #-------------------------------------------------------------------------------
+    # # ANALIZA OTRZYAMANYCH CECH
     # df = pd.read_csv('features_for_training.csv')
     #
     # print(df.describe())
@@ -372,56 +329,7 @@ if __name__ == '__main__':
     #     plt.title(f"Distribution of {feature}")
     #     plt.show()
 
-    svm = pd.read_csv('metrics/svm_metrics.csv')
-    svm = svm['bal_acc']
-    print("SVM:", svm.mean())
-    dt = pd.read_csv('metrics/dt_metrics.csv')
-    dt = dt['bal_acc']
-    print("kNN:", dt.mean())
-    print(stats.ttest_ind(svm, dt))
-    # czyli są statysczne róznice! yaya OKII
-    # powyżej jest średnia bal_accuracy
-    # czyli lepszy chyba SVM tutaj
 
-    # chciałam zobaczyć manove, mozesz poczytać czy to ma sens tutaj MANOVA
+    print(boxplot(Classifiers.kNN, 'recall'))
+    print(manova('bal_acc','precision'))
 
-    data = []
-
-    directories = ['metrics/knn_metrics.csv', 'metrics/svm_metrics.csv', 'metrics/dt_metrics.csv']
-
-    for classifier in directories:
-        # Read the metrics file
-        df = pd.read_csv(classifier)
-
-        # Extract the classifier name from the file path
-        classifier_name = classifier.split('/')[-1].split('_')[0]
-
-        for _, row in df.iterrows():
-            # Get the balanced accuracy and f1-score for each row
-            balanced_accuracy = row['bal_acc']
-            f1_score = row['f1_score']
-
-            # Create a new dictionary with the classifier name, balanced accuracy, and f1-score
-            data_row = {'Classifier': classifier_name, 'bal_acc': balanced_accuracy, 'f1_score': f1_score}
-
-            # Append the row to the data list
-            data.append(data_row)
-
-    # Convert the data list to a DataFrame
-    data = pd.DataFrame(data)
-    data.to_csv("test.csv", index=False)
-
-    fit = MANOVA.from_formula('bal_acc + f1_score ~ Classifier', data=data)
-    print(fit.mv_test())
-
-
-    X = data[["bal_acc", "f1_score"]]
-    y = data["Classifier"]
-    post_hoc = lda().fit(X=X, y=y)
-
-
-    # plot
-    X_new = pd.DataFrame(lda().fit(X=X, y=y).transform(X), columns=["lda1", "lda2"])
-    X_new["Classifier"] = data["Classifier"]
-    sns.scatterplot(data=X_new, x="lda1", y="lda2", hue=data.Classifier.tolist())
-    plt.show()
