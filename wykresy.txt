@@ -1,0 +1,28 @@
+Okej to po kolei. Co robilismy jakie wykresy potrzebujemy. Napierw było łączenie danych do jednego
+pliku:
+1) 4 kanały do jednego
+Następnie normalizacja (nie do końca ale taki jest logiczny ciąg xd)
+2) znormalizowane wykresy min/max (gdzie min to średnia z maksymalnych pików w 3 ruchach, analogicznie max)
+Potem sygnał ten dałyśmy do segmentacji już, gdzie wydzielałyśmy 18 klas plus klasę spoczynkową
+3) segmentacja
+Następnie wydzielałyśmy z tych segmentów cechy. Można zwizualizować każdą wydzieloną cechę z jednego wybranego segemntu
+4) wydzielenie cech z segemntu
+Następnie przeszłyśmy do analizy wektorów cech, otrzymałyśmy w sumie macierz 1134 : 8 (8 cech, 1134 próbek dla każdej cechy, należących do jednej z 18 klas)
+5) korelacja cech
+6) histogramy rozkładu cech
+7) pairplot (nie dla wszystkich ale np MAV i RMS żeby pokazać ze są ze sobą silnie skorelowane liniowo)
+Po tej analizie zastosowałyśmy skalowanie (MinMaxScaler) i wybieranie najlepszych cech z użyciem parametru chi2 (selectKbest).
+Można napisać o jakie cechy kbest wybiera (zrobiłam funkcję returnKbest która pokazuje które cechy zostały wykorzystane
+Dalej wykonujemy klasyfikację. Po tym dostajemy wyniki - 25 niezależnych wartości dla każdej z 4 metryk. Głównie wykorzystujemy bal_acc.
+Można pokazać te boxploty:
+8) boxploty kolejnych iteracji kolejnych foldów wyników
+* klasyfikacja z użyciem tylko FMN i FMD
+* można zrobić dla niej te następne kroki
+Następnie testy statystyczne. Najpierw sprawdziliśmy czy jest rozkład normalny testami, i czy jest równość wariancji (czy coś takiego XD)
+Potem stosujemy test t studenta dla zmiennych od siebie niezależnych (porównując ze sobą 2 modele i jedną metrykę)
+9) Wykresy rozkładu tstudenta
+Testowałyśmy też 3 algorytmy na MANOVIE (porównując wszystkie metryki i dwie metryki)
+Z tej MANOVY dla 2 metryk dla 3 algorytmów są wykresy. Można zrobić takie coś jak pairploty, wsm będziemy tu miały 4x4 wykresy (albo 1 jeśli nie chcemy).
+Dobrze tam widać różnice między klasami.
+10) MANOVA
+
