@@ -1,7 +1,9 @@
 from sklearn.svm import SVC
+from itertools import combinations
 
 from Classifiers import Classifiers
-from Statistics import normal_distribution_check, boxplot, manova
+from Metrics import Metrics
+from Statistics import normal_distribution_check, boxplot, manova, ttest_independent
 from scipy import stats
 from statsmodels.multivariate.manova import MANOVA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as lda
@@ -20,7 +22,7 @@ from FeatureExtractor import extract_features, extract_features_to_csv
 from Utils import read_data, threshold_segmentation_with_window, save_segments_to_files, check_if_csv, \
     normalize_data
 from Visualizator import visualize_selected_moves
-from Classifier import Validation_and_Classification, Plot_tree_model, evaluation_statistics
+from Classifier import Validation_and_Classification, Plot_tree_model, evaluation_statistics, returnKbest
 
 
 def filtering_n_segmenting_signals():
@@ -330,6 +332,39 @@ if __name__ == '__main__':
     #     plt.show()
 
 
-    print(boxplot(Classifiers.kNN, 'recall'))
-    print(manova('bal_acc','precision'))
+    # print(boxplot(Classifiers.kNN, 'recall'))
+    # print(manova('bal_acc','precision'))
+
+    """
+    T student for all metrics
+    """
+
+    # for metric in Metrics:
+    #     print(ttest_independent(Classifiers.kNN, Classifiers.SVM, metric))
+    #     print(ttest_independent(Classifiers.DT, Classifiers.SVM, metric))
+    #     print(ttest_independent(Classifiers.DT, Classifiers.kNN, metric))
+
+
+    """
+    MANOVA for all metrics
+    """
+
+    # metric_pairs = list(combinations(Metrics, 2))
+    #
+    # # Iterate over metric pairs
+    # for metric_a, metric_b in metric_pairs:
+    #     print(f"Manova for {metric_a.value} and {metric_b.value}")
+    #     print(manova(metric_a, metric_b))
+
+
+
+
+
+
+
+
+
+
+
+
 

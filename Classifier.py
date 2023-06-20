@@ -101,3 +101,23 @@ def Validation_and_Classification(directory: str, classifier, best_feature_amoun
     #plt.show()
 
     return bal_acc_scores, f1_scores, precision_scores, recall_scores, full_metrics
+
+
+def returnKbest(directory, best_feature_amount):
+    df = pd.read_csv(directory)
+    X = df[['RMS', 'MAV', 'IEMG', 'VAR', 'WL', 'WAMP', 'FMN', 'FMD']]
+    y = df['Class']
+
+    scaler = MinMaxScaler()
+    X_scaled = scaler.fit_transform(X)
+    select = SelectKBest(chi2, k=best_feature_amount)
+    X_new = select.fit_transform(X_scaled, y)
+
+    mask = select.get_support()
+    new_features = X.columns[mask]
+
+    return new_features
+
+
+
+
