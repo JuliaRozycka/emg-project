@@ -90,7 +90,7 @@ def Train_SVM():
     df['precision'] = svm_model[2]
     df['recall'] = svm_model[3]
 
-    df.to_csv('metrics/svm_metrics.csv', index=False)
+    #df.to_csv('metrics/svm_metrics.csv', index=False)
 
 
 def Train_Decision_Tree():
@@ -108,7 +108,7 @@ def Train_Decision_Tree():
     df['precision'] = tree_model[2]
     df['recall'] = tree_model[3]
 
-    df.to_csv('metrics/dt_metrics.csv', index=False)
+    # df.to_csv('metrics/dt_metrics.csv', index=False)
 
 def Train_KNN():
     directory = 'features_for_training.csv'
@@ -126,7 +126,7 @@ def Train_KNN():
     df['precision'] = knn_model[2]
     df['recall'] = knn_model[3]
 
-    df.to_csv('metrics/knn_metrics.csv', index=False)
+    #df.to_csv('metrics/knn_metrics.csv', index=False)
 
 
 def check_distribution(directory: str):
@@ -136,8 +136,7 @@ def check_distribution(directory: str):
 
 
 if __name__ == '__main__':
-    pass
-
+    #pass
     # ---------------------------------------------------------------------------------
     # mpl.rcParams['font.family'] = 'serif'
     # mpl.rcParams['font.serif'] = ['Times New Roman']
@@ -176,14 +175,14 @@ if __name__ == '__main__':
 
     # ---------------------------------------------------------------------------------
 
-    # print('DECISION TREE CLASSIFICATION METRICS: ')
-    # Train_Decision_Tree()
-    #
-    # print('K-NEAREST NEIGHBOUR METRICS: ')
-    # Train_KNN()
-    #
-    # print('SVM METRICS: ')
-    # Train_SVM()
+    print('DECISION TREE CLASSIFICATION METRICS: ')
+    Train_Decision_Tree()
+
+    print('K-NEAREST NEIGHBOUR METRICS: ')
+    Train_KNN()
+
+    print('SVM METRICS: ')
+    Train_SVM()
 
     # ---------------------------------------------------------------------------------
 

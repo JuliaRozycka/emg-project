@@ -95,6 +95,6 @@ def Validation_and_Classification(directory: str, classifier, best_feature_amoun
     # eval_metrics= pd.DataFrame({
     #     'Balanced accuracy': bal_acc_scores, 'F1 score': f1_scores, 'Precision': precision_scores, 'Recall': recall_scores}, index=[0])
     # eval_raport= pd.DataFrame({'Classification report': full_metrics}, index=[0])
-    # plt.show()
+    plt.show()
 
     return bal_acc_scores, f1_scores, precision_scores, recall_scores, full_metrics
